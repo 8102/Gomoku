@@ -1,0 +1,15 @@
+# Binary to test ############
+a.out
+test
+# Backup/temporary files ####
+#*#
+*.*~
+# Compiled Object files #####
+*.slo
+*.lo
+*.o
+# Compiled Dynamic library ##
+*.dylib
+# Compiled Static library ###
+*.lai
+*.la
