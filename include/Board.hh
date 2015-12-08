@@ -42,6 +42,10 @@ public:
 
   // Board routines
   bool			boardIsFull() const;
+
+public:
+
+  char      operator[](unsigned int position) const;
 };
 
 #endif // !BOARD_HH_

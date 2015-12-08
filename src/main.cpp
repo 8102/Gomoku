@@ -9,8 +9,18 @@
 //
 
 #include "Board.hh"
+#include "GameEngine.hh"
 
+//#ifdef      _WIN32
+//int         WINAPI    WinMain() {}
+//#elif       _linux
 int main() {
+//#endif      /* !PlatForm */
+
   Board obj;
+
+  GameEngine    engine(obj);
+  engine.init();
+  engine.run();
   return (0);
 }

@@ -25,6 +25,11 @@ char		Board::getCase(int x, int y) const {
   return (_board[POS(x,y)]);
 }
 
+char    Board::operator[](unsigned int position) const {
+
+  return _board[position];
+}
+
 bool		Board::setCase(int x, int y, char status) {
   if (_board[POS(x,y)] == INHIBITED)
     return (false);
