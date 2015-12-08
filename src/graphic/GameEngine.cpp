@@ -92,7 +92,12 @@ bool            GameEngine::treatAction() {
     return false;
   if (_board.getCase(p.x, p.y) != EMPTY)
     return false;
-  _board.setCase(p.x, p.y, 1);
+
+
+  /* decision de l'arbitre */
+
+
+  _board.setCase(p.x - 1, p.y - 1, (_playerIndex % 2) + 1 + 48);
   sf::CircleShape     c(10.0f);
   c.setFillColor(_playerColors[_playerIndex % 2]);
   c.setPosition(p.x * 45 - 10, p.y * 45 - 10);
