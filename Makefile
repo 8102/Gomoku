@@ -53,8 +53,9 @@ GRAPHICS_INC_DIR	=	$(addprefix $(INCLUDE_DIR), graphic/)
 GRAPHICS_SRCS		=	$(addprefix $(GRAPHICS_SRC_DIR), $(GRAPHICS_SRC))
 GRAPHICS_OBJS		=	$(addsuffix .o, $(basename $(subst $(GRAPHICS_SRC_DIR), $(GRAPHICS_OBJ_DIR), $(GRAPHICS_SRCS))))
 
-BASE_SRC				?=	main.cpp							\
-										Board.cpp							\
+BASE_SRC		?=	main.cpp\
+				Board.cpp\
+				Player.cpp\
 
 GRAPHICS_SRC		?=	GameEngine.cpp				\
 
