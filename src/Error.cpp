@@ -29,3 +29,13 @@ DoubleThreeRule::DoubleThreeRule(std::string const &message) :
 {
 
 }
+
+/*
+** NotEmptyError
+*/
+
+NotEmptyError::NotEmptyError(std::string const &message) :
+	GomokuError(message)
+{
+
+}

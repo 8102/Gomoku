@@ -37,3 +37,14 @@ public:
 };
 
 #endif // _DOUBLE_THREE_RULE
+
+#ifndef _NOT_EMPTY_ERROR
+# define _NOT_EMPTY_ERROR
+
+class NotEmptyError : public GomokuError
+{
+public:
+	NotEmptyError(std::string const &message);
+};
+
+#endif // _NOT_EMPTY_ERROR

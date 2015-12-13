@@ -29,8 +29,11 @@ int		Referee::getWinner() const
 
 void	Referee::putPieceOnBoard(int x, int y, char player)
 {
+	if (_board.getCase(x, y) == PLAYER1 || _board.getCase(x, y) == PLAYER2)
+		throw NotEmptyError("This case is already use by player " + player);
 	_checkDoubleThree(x, y, player);
-	_checkBreakableFive();
+	_checkCapturedPawn();
+	_checkBreakableFive(); // and check if there is a winner btw
 }
 
 /*
@@ -60,11 +63,6 @@ void	Referee::_checkDoubleThree(int x, int y, char player) const
 			}
 		}
 	}
-}
-
-void	Referee::_checkBreakableFive() const
-{
-
 }
 
 int		Referee::_lineSum(char c1, char c2, char c3, char c4, char player) const
@@ -117,9 +115,9 @@ bool	Referee::_freeThree(int x, int y, char player, enum direction dir) const
 				    		_board.getCase(sp_x + 3, sp_y),
 				    		player) == 3 &&
 					(_board.getCase(sp_x - 1, sp_y) == EMPTY ||
-					_board.getCase(sp_x - 1, sp_y) == player + 1) &&
+					_board.getCase(sp_x - 1, sp_y) + player == 5) &&
 					(_board.getCase(sp_x + 4, sp_y) == EMPTY ||
-					 _board.getCase(sp_x + 4, sp_y) == player + 1))
+					 _board.getCase(sp_x + 4, sp_y) + player == 5))
 					return (true);
 				sp_x += 1;
 				break;
@@ -130,9 +128,9 @@ bool	Referee::_freeThree(int x, int y, char player, enum direction dir) const
 				    		_board.getCase(sp_x, sp_y + 3),
 				    		player) == 3 &&
 					(_board.getCase(sp_x, sp_y - 1) == EMPTY ||
-					_board.getCase(sp_x, sp_y - 1) == player + 1) &&
+					_board.getCase(sp_x, sp_y - 1) + player == 5) &&
 					(_board.getCase(sp_x, sp_y + 4) == EMPTY ||
-					 _board.getCase(sp_x, sp_y + 4) == player + 1))
+					 _board.getCase(sp_x, sp_y + 4) + player == 5))
 					return (true);
 				sp_y += 1;
 				break;
@@ -143,9 +141,9 @@ bool	Referee::_freeThree(int x, int y, char player, enum direction dir) const
 				    		_board.getCase(sp_x + 3, sp_y + 1),
 				    		player) == 3 &&
 					(_board.getCase(sp_x - 1, sp_y - 1) == EMPTY ||
-					_board.getCase(sp_x - 1, sp_y - 1) == player + 1) &&
+					_board.getCase(sp_x - 1, sp_y - 1) + player == 5) &&
 					(_board.getCase(sp_x + 4, sp_y + 4) == EMPTY ||
-					 _board.getCase(sp_x + 4, sp_y + 4) == player + 1))
+					 _board.getCase(sp_x + 4, sp_y + 4) + player == 5))
 					return (true);
 				sp_x += 1;
 				sp_y += 1;
@@ -157,9 +155,9 @@ bool	Referee::_freeThree(int x, int y, char player, enum direction dir) const
 				    		_board.getCase(sp_x - 3, sp_y - 3),
 				    		player) == 3 &&
 					(_board.getCase(sp_x + 1, sp_y + 1) == EMPTY ||
-					_board.getCase(sp_x + 1, sp_y + 1) == player + 1) &&
+					_board.getCase(sp_x + 1, sp_y + 1) + player == 5) &&
 					(_board.getCase(sp_x - 4, sp_y - 4) == EMPTY ||
-					 _board.getCase(sp_x - 4, sp_y - 4) == player + 1))
+					 _board.getCase(sp_x - 4, sp_y - 4) + player == 5))
 					return (true);
 				sp_x -= 1;
 				sp_y -= 1;
@@ -185,4 +183,14 @@ unsigned int	Referee::_countFreeThree(int x, int y, char player) const
 	if (_freeThree(x, y, player, SECONDARY_DIAGONAL))
 		nbFreeThree += 1;
 	return (nbFreeThree);
+}
+
+void	Referee::_checkBreakableFive() const
+{
+
+}
+
+void	Referee::_checkCapturedPawn() const
+{
+
 }

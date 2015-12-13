@@ -38,6 +38,7 @@ private:
 private:
 	void			_checkDoubleThree(int x, int y, char player) const;
 	void			_checkBreakableFive() const;
+	void			_checkCapturedPawn() const;
 	unsigned int	_countFreeThree(int x, int y, char player) const;
 	bool			_freeThree(int x, int y, char player, enum direction dir) const;
 	int				_lineSum(char c1, char c2, char c3, char c4, char player) const;
