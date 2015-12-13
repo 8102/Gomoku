@@ -22,6 +22,8 @@ const char*	Board::getBoard() const {
 }
 
 char		Board::getCase(int x, int y) const {
+  if (x < 0 || y < 0 || x >= MAX_WIDTH || y >= MAX_HEIGHT)
+    return (-1);
   return (_board[POS(x,y)]);
 }
 

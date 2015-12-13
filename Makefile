@@ -56,6 +56,8 @@ GRAPHICS_OBJS		=	$(addsuffix .o, $(basename $(subst $(GRAPHICS_SRC_DIR), $(GRAPH
 BASE_SRC		?=	main.cpp\
 				Board.cpp\
 				Player.cpp\
+				Error.cpp\
+				Referee.cpp
 
 GRAPHICS_SRC		?=	GameEngine.cpp				\
 
