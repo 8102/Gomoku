@@ -33,8 +33,19 @@ void            GameEngine::run() {
       _win->draw(b);
       if (treatEvent() == true)
           stop();
-      for (auto it = _pawns.begin(); it != _pawns.end(); it++)
-        _win->draw(*it);
+      sf::CircleShape pawn(10.0f);
+      for (auto i = 0; i < MAX_WIDTH; i++)
+        for (auto j = 0; j < MAX_HEIGHT; j++) {
+          char c = '0';
+          if ((c = _board.getCase(i, j)) != EMPTY) {
+            pawn.setFillColor(c == PLAYER1 ? sf::Color::White : (c == PLAYER2 ? sf::Color::Black : sf::Color::Red));
+            pawn.setPosition(sf::Vector2f(45.0f + i * 45.0f - 10.0f, 45.0f + j * 45.0f - 10.0f));
+            _win->draw(pawn);
+          }
+        }
+
+      // for (auto it = _pawns.begin(); it != _pawns.end(); it++)
+      //   _win->draw(*it);
       _win->display();
     }
 }
@@ -44,6 +55,7 @@ bool            GameEngine::getTarget(sf::Vector2i& target)
   sf::Vector2f  location = sf::Vector2f(sf::Mouse::getPosition(*_win));
   sf::FloatRect bounds(sf::FloatRect(location.x - 5, location.y - 5, location.x + 5, location.y + 5));
 
+  std::cout << "Click on " << location.x << ", " << location.y << std::endl;
   for (auto i = 1; i < 20; i++)
     for (auto j = 1; j < 20; j++)
       {
