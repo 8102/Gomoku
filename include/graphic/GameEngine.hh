@@ -5,6 +5,7 @@
 
 #include      "Board.hh"
 #include      "common.hpp"
+#include      "Referee.hh"
 
 # define      DEFAULT_WIN_W  1600
 # define      DEFAULT_WIN_H  900
@@ -31,6 +32,7 @@ public:
 private:
 
   Board&      _board;
+  Referee     _referee;
 
 private:
 

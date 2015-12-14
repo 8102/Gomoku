@@ -1,7 +1,7 @@
 #include      "GameEngine.hh"
 
 GameEngine::GameEngine(Board& board)
-  : _board(board), _playerIndex(0), _isRunning(false) {
+  : _board(board), _referee(board), _playerIndex(0), _isRunning(false) {
 
     _playerColors.push_back(sf::Color::White);
     _playerColors.push_back(sf::Color::Black);
@@ -90,18 +90,35 @@ bool            GameEngine::treatAction() {
 
   if (getTarget(p) == false)
     return false;
-  if (_board.getCase(p.x, p.y) != EMPTY)
-    return false;
+  // if (_board.getCase(p.x - 1, p.y - 1) != EMPTY)
+  //   return false;
 
 
   /* decision de l'arbitre */
 
-
-  _board.setCase(p.x - 1, p.y - 1, (_playerIndex % 2) + 1 + 48);
-  sf::CircleShape     c(10.0f);
-  c.setFillColor(_playerColors[_playerIndex % 2]);
-  c.setPosition(p.x * 45 - 10, p.y * 45 - 10);
-  _pawns.push_back(c);
-  ++_playerIndex;
+//  _board.setCase(p.x - 1, p.y - 1, (_playerIndex % 2) + 1 + 48);
+  try
+  {
+    _referee.putPieceOnBoard(p.x - 1, p.y - 1, (_playerIndex % 2) + 1 + 48);
+    sf::CircleShape     c(10.0f);
+   c.setFillColor(_playerColors[_playerIndex % 2]);
+   c.setPosition(p.x * 45 - 10, p.y * 45 - 10);
+   _pawns.push_back(c);
+   ++_playerIndex;
+  }
+  catch (NotEmptyError &e)
+  {
+    std::cerr << "Cell not empty..." << std::endl;
+    std::cerr << e.what() << std::endl;
+  }
+  catch (DoubleThreeRule &e)
+  {
+    std::cerr << "[WARNING]: GameEngine -> treatAction: You're not allowed to put your piece here (double three rule) !" << std::endl;
+    std::cerr << e.what() << std::endl;
+  }
+  if (char winner = _referee.getWinner())
+  {
+    std::cout << "WINNER: " << winner << std::endl; 
+  }
   return true;
 }
