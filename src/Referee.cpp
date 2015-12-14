@@ -30,9 +30,9 @@ int		Referee::getWinner() const
 void	Referee::putPieceOnBoard(int x, int y, char player)
 {
 	if (_board.getCase(x, y) == PLAYER1 || _board.getCase(x, y) == PLAYER2)
-		throw NotEmptyError("This case is already use by player " + player);
+		throw NotEmptyError("This case is already use by player " + std::string(&player, 1));
 	_checkDoubleThree(x, y, player);
-	_checkCapturedPawn(); // to do
+	_checkCapturedPawn(x, y);
 	_checkWinner();
 }
 
@@ -284,7 +284,7 @@ void	Referee::_checkWinner()
 
 	for (int i = 0; i < MAX_HEIGHT; ++i)
 	{
-		for (int j = 0; i < MAX_WIDTH; ++j)
+		for (int j = 0; j < MAX_WIDTH; ++j)
 		{
 			if (_fivePieceAligned(j, i, dirs))
 			{
@@ -299,7 +299,70 @@ void	Referee::_checkWinner()
 	}
 }
 
-void	Referee::_checkCapturedPawn() const
+void	Referee::_removeDoubleThree(int x1, int y1, int x2, int y2, char player) const
 {
+	int sp_x1(MIN(x1, x2) - 3), sp_y1(MIN(y1, y2) - 3), ep_x2(MAX(x1, x2) + 3), ep_y2(MAX(y1, y2) + 3);
 
+	for (int i = sp_y1; i <= ep_y2; ++i)
+	{
+		for (int j = sp_x1; j <= ep_x2; ++j)
+		{
+			if (_board.getCase(j, i) == player + 2 && _countFreeThree(j, i, player) < 2)
+				_board.setCase(j, i, EMPTY);
+		}
+	}
+}
+
+void	Referee::_checkCapturedPawn(int x, int y) const
+{
+	char player = _board.getCase(x, y), enemy = player % 2 + 1;
+
+	if (_board.getCase(x + 1, y) == enemy && _board.getCase(x + 2, y) == enemy && _board.getCase(x + 3, y) == player)
+	{
+		_board.setCase(x + 1, y, EMPTY);
+		_board.setCase(x + 2, y, EMPTY);
+		_removeDoubleThree(x + 1, y, x + 2, y, enemy);
+	}
+	if (_board.getCase(x - 1, y) == enemy && _board.getCase(x - 2, y) == enemy && _board.getCase(x - 3, y) == player)
+	{
+		_board.setCase(x - 1, y, EMPTY);
+		_board.setCase(x - 2, y, EMPTY);		
+		_removeDoubleThree(x - 1, y, x - 2, y, enemy);
+	}
+	if (_board.getCase(x, y + 1) == enemy && _board.getCase(x, y + 2) == enemy && _board.getCase(x, y + 3) == player)
+	{
+		_board.setCase(x, y + 1, EMPTY);
+		_board.setCase(x, y + 2, EMPTY);
+		_removeDoubleThree(x, y + 1, x, y + 2, enemy);
+	}
+	if (_board.getCase(x, y - 1) == enemy && _board.getCase(x, y - 2) == enemy && _board.getCase(x, y - 3) == player)
+	{
+		_board.setCase(x, y - 1, EMPTY);
+		_board.setCase(x, y - 2, EMPTY);
+		_removeDoubleThree(x, y - 1, x, y - 2, enemy);
+	}
+	if (_board.getCase(x + 1, y + 1) == enemy && _board.getCase(x + 2, y + 2) == enemy && _board.getCase(x + 3, y + 3) == player)
+	{
+		_board.setCase(x + 1, y + 1, EMPTY);
+		_board.setCase(x + 2, y + 2, EMPTY);
+		_removeDoubleThree(x + 1, y + 1, x + 2, y + 2, enemy);
+	}
+	if (_board.getCase(x - 1, y - 1) == enemy && _board.getCase(x - 2, y - 2) == enemy && _board.getCase(x - 3, y - 3) == player)
+	{
+		_board.setCase(x - 1, y - 1, EMPTY);
+		_board.setCase(x - 2, y - 2, EMPTY);
+		_removeDoubleThree(x - 1, y - 1, x - 2, y - 2, enemy);
+	}
+	if (_board.getCase(x + 1, y - 1) == enemy && _board.getCase(x + 2, y - 2) == enemy && _board.getCase(x + 3, y - 3) == player)
+	{
+		_board.setCase(x + 1, y - 1, EMPTY);
+		_board.setCase(x + 2, y - 2, EMPTY);
+		_removeDoubleThree(x + 1, y - 1, x + 2, y - 2, enemy);
+	}
+	if (_board.getCase(x - 1, y + 1) == enemy && _board.getCase(x - 2, y + 2) == enemy && _board.getCase(x - 3, y + 3) == player)
+	{
+		_board.setCase(x - 1, y + 1, EMPTY);
+		_board.setCase(x - 2, y + 2, EMPTY);
+		_removeDoubleThree(x - 1, y + 1, x - 2, y + 2, enemy);
+	}
 }
