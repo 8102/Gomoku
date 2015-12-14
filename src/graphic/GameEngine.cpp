@@ -38,7 +38,7 @@ void            GameEngine::run() {
         for (auto j = 0; j < MAX_HEIGHT; j++) {
           char c = '0';
           if ((c = _board.getCase(i, j)) != EMPTY) {
-            pawn.setFillColor(c == PLAYER1 ? sf::Color::White : (c == PLAYER2 ? sf::Color::Black : sf::Color::Red));
+            pawn.setFillColor(c == PLAYER1 ? sf::Color::White : (c == PLAYER2 ? sf::Color::Black : (c == '3' ? sf::Color::Red : sf::Color::Yellow)));
             pawn.setPosition(sf::Vector2f(45.0f + i * 45.0f - 10.0f, 45.0f + j * 45.0f - 10.0f));
             _win->draw(pawn);
           }
@@ -130,7 +130,7 @@ bool            GameEngine::treatAction() {
   }
   if (char winner = _referee.getWinner())
   {
-    std::cout << "WINNER: " << winner << std::endl; 
+    std::cout << "WINNER: " << winner << std::endl;
   }
   return true;
 }
