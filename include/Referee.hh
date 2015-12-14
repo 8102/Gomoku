@@ -4,6 +4,7 @@
 # include <utility>
 # include <string>
 # include <iostream>
+# include <vector>
 # include "Board.hh"
 # include "Error.hh"
 
@@ -32,22 +33,26 @@ private:
 		LINE,
 		COLUMN,
 		MAIN_DIAGONAL,
-		SECONDARY_DIAGONAL
+		SECONDARY_DIAGONAL,
+		NONE
 	};
 
 private:
 	void			_checkDoubleThree(int x, int y, char player) const;
-	void			_checkBreakableFive() const;
+	void			_checkWinner();
 	void			_checkCapturedPawn() const;
 	unsigned int	_countFreeThree(int x, int y, char player) const;
 	bool			_freeThree(int x, int y, char player, enum direction dir) const;
 	int				_lineSum(char c1, char c2, char c3, char c4, char player) const;
+	bool			_fivePieceAligned(int x, int y, std::vector<enum direction> &dirs) const;
+	bool			_isBreakable(int x, int y, enum direction dir) const;
 
 private:
 
 	Board				&_board;
 	int					_winner;
 	std::pair<int, int> _lastPiece;
+	std::vector<int>	_jail;
 
 };
 
