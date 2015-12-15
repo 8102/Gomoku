@@ -117,7 +117,7 @@ void            GameEngine::run() {
   errorText.setFont(_font);
   initButtons();
   text.setPosition(45 * 21 + 100, 45);
-  errorText.setPosition(45 * 21 + 25.0f, 45 * 15);
+  errorText.setPosition(45 * 21 + 25.0f, 450);
   for (auto i = 0; i <= 20; i++) {
         a[i * 2].position = vf(i * 45 + 1, 0);
         a[(i * 2) + 1].position = vf(i * 45, 900);
