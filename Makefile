@@ -57,7 +57,8 @@ BASE_SRC		?=	main.cpp\
 				Board.cpp\
 				Player.cpp\
 				Error.cpp\
-				Referee.cpp
+				Referee.cpp\
+				Game.cpp
 
 GRAPHICS_SRC		?=	GameEngine.cpp				\
 
