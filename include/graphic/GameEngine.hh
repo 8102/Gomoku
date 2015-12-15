@@ -6,6 +6,7 @@
 #include      "Board.hh"
 #include      "common.hpp"
 #include      "Referee.hh"
+#include      <sstream>
 
 # define      DEFAULT_WIN_W  1600
 # define      DEFAULT_WIN_H  900
@@ -38,7 +39,7 @@ public:
   void        resetBoard();
   void        changeCaptureRule();
   void        changeDbleThreeRule();
-
+  void        setJailsText(std::string&, std::string&);
 private:
 
   Board&      _board;

@@ -53,7 +53,6 @@ void            GameEngine::initButtons() {
 
   sf::RectangleShape  button(sf::Vector2f(488.0f, 295.0f));
   button.setScale(sf::Vector2f(0.25f, 0.25f));
-
   button.setTexture(&_textures["button1"]);
   button.setPosition(sf::Vector2f(45.0F * 21, 45.0f * 18.0f));
   _buttons.push_back(button);
@@ -70,6 +69,7 @@ void            GameEngine::initButtons() {
   button.setPosition(sf::Vector2f(45.0F * 21 + 450.0f, 45.0f * 18.0f));
   _buttons.push_back(button);
   _buttonFct[3] = &GameEngine::stop;
+
 }
 
 void            GameEngine::drawRulesState() {
@@ -91,13 +91,35 @@ void            GameEngine::drawRulesState() {
 
 }
 
+void            GameEngine::setJailsText(std::string& s1, std::string& s2) {
+
+  std::stringstream ss;
+  const std::vector<int>&  v = _referee.getJail();
+
+  ss << v[0];
+  s1 = "Player 1 captured pawns : ";
+  s1 += ss.str();
+  ss.str("");
+  ss << v[1];
+  s2 = "Player 2 captured pawns : ";
+  s2 += ss.str();
+}
+
+
 void            GameEngine::run() {
 
   sf::Text      text("", _font, 60);
   sf::Text      errorText("", _font, 60);
+  sf::Text      jailsP1("toto", _font, 30);
+  sf::Text      jailsP2("titi", _font, 30);
 
   text.setColor(sf::Color::Black);
   errorText.setColor(sf::Color::Black);
+  jailsP1.setColor(sf::Color::White);
+  jailsP1.setPosition(sf::Vector2f(45 * 20.0f + 100.0f, 45.0f * 5.0f));
+  jailsP2.setColor(sf::Color::Black);
+  jailsP2.setPosition(sf::Vector2f(45 * 20.0f + 100.0f, 45.0f * 7.0f));
+
   sf::VertexArray   a(sf::Lines, 21 * 2);
   sf::VertexArray   b(sf::Lines, 21 * 2);
   sf::RectangleShape r(sf::Vector2f(45.0f * 20.0f, 45.0f * 20.0f));
@@ -133,6 +155,12 @@ void            GameEngine::run() {
       _win->draw(r2);
       _win->draw(a);
       _win->draw(b);
+      _win->draw(jailsP1);
+      _win->draw(jailsP2);
+      std::string s1, s2;
+      setJailsText(s1, s2);
+      jailsP1.setString(s1);
+      jailsP2.setString(s2);
       for (auto it = _buttons.begin(); it != _buttons.end(); it++)
         _win->draw(*it);
       drawRulesState();
