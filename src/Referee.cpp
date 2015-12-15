@@ -183,7 +183,7 @@ bool		Referee::_fivePieceAligned(int x, int y, std::vector<enum direction> &dirs
 			column += 1;
 		if (_board.getCase(x + i, y + i) == player)
 			mainDiag += 1;
-		if (_board.getCase(x - i, y - i) == player)
+		if (_board.getCase(x - i, y + i) == player)
 			secondDiag += 1;
 	}
 	if (line == 5)
