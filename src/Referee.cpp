@@ -4,7 +4,7 @@
 ** Constructor / Destructor
 */
 
-Referee::Referee(Board &board) : _board(board), _winner(0), _lastPiece(-1, -1), _jail(2, 0)
+Referee::Referee(Board &board) : _board(board), _winner(0), _lastPiece(-1, -1), _jail(2, 0), _cDbleThree(true), _cCapture(true)
 {
 
 }
@@ -23,6 +23,25 @@ int		Referee::getWinner() const
 	return (_winner);
 }
 
+void Referee::setDoubleThreeRule(bool const& b) {
+
+	_cDbleThree = b;
+}
+
+void Referee::setCaptureRule(bool const& b) {
+
+	_cCapture = b;
+}
+
+bool Referee::getDoubleThreeRule() const {
+
+	return _cDbleThree;
+}
+
+bool Referee::getCaptureRule() const {
+
+	return _cCapture;
+}
 /*
 ** Public methodes
 */
@@ -31,8 +50,10 @@ void	Referee::putPieceOnBoard(int x, int y, char player)
 {
 	if (_board.getCase(x, y) == PLAYER1 || _board.getCase(x, y) == PLAYER2)
 		throw NotEmptyError("This case is already use by player " + std::string(&player, 1));
-	_checkDoubleThree(x, y, player);
-	_checkCapturedPawn(x, y);
+	if (_cDbleThree == true)
+		_checkDoubleThree(x, y, player);
+	if (_cCapture == true)
+		_checkCapturedPawn(x, y);
 	_checkWinner();
 }
 
@@ -59,7 +80,7 @@ void	Referee::_checkDoubleThree(int x, int y, char player) const
 						_board.setCase(current_x, current_y, player + DOUBLE_THREE_RULE);
 					else
 						_board.setCase(current_x, current_y, EMPTY); // annulation
-				}				
+				}
 			}
 		}
 	}
@@ -122,7 +143,7 @@ bool	Referee::_freeThree(int x, int y, char player, enum direction dir) const
 		default:
 			std::cerr << "[ERROR]: In Referee instance -> _freeThree: unknown direction" << std::endl;
 			break;
-	}		
+	}
 	return (false);
 }
 
@@ -287,7 +308,7 @@ void	Referee::_checkCapturedPawn(int x, int y)
 	if (_board.getCase(x - 1, y) == enemy && _board.getCase(x - 2, y) == enemy && _board.getCase(x - 3, y) == player)
 	{
 		_board.setCase(x - 1, y, EMPTY);
-		_board.setCase(x - 2, y, EMPTY);		
+		_board.setCase(x - 2, y, EMPTY);
 		_jail[player - '0' - 1] += 2;
 		_removeDoubleThree(x - 1, y, x - 2, y, enemy);
 	}

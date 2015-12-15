@@ -20,6 +20,7 @@ public:
 public:
 
   void        loadAssets();
+  void        initButtons();
   void        init(unsigned int const& winWidth = DEFAULT_WIN_W, unsigned int const& winHeight = DEFAULT_WIN_H, std::string const& title = WIN_TITLE);
   void        run();
   void        stop();
@@ -29,6 +30,14 @@ public:
   bool        treatEvent(std::string& s);
   bool        treatAction(std::string& s);
   bool        getTarget(sf::Vector2i& v);
+
+public:
+
+  bool        getButtonTarget();
+  void        drawRulesState();
+  void        resetBoard();
+  void        changeCaptureRule();
+  void        changeDbleThreeRule();
 
 private:
 
@@ -40,6 +49,8 @@ private:
   std::unique_ptr< sf::RenderWindow >   _win;
   std::map<std::string, sf::Texture>    _textures;
   sf::Font                              _font;
+  std::vector<sf::RectangleShape>       _buttons;
+  void                                  (GameEngine::*_buttonFct[4])();
 
 private:
 
@@ -50,6 +61,7 @@ private:
 
   bool      _isRunning;
   bool      _winner;
+  std::string _info;
 };
 
 #endif         /* !___GAME_ENGINE_HH___ */

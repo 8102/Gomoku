@@ -46,7 +46,7 @@ public:
 
 public:
 
-  char      operator[](unsigned int position) const;
+  char&      operator[](unsigned int position);
 };
 
 #endif // !BOARD_HH_

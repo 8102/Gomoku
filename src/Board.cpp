@@ -27,7 +27,7 @@ char		Board::getCase(int x, int y) const {
   return (_board[POS(x,y)]);
 }
 
-char    Board::operator[](unsigned int position) const {
+char&    Board::operator[](unsigned int position) {
 
   return _board[position];
 }

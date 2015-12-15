@@ -1,7 +1,7 @@
 #include      "GameEngine.hh"
 
 GameEngine::GameEngine(Board& board)
-  : _board(board), _referee(board), _playerIndex(0), _isRunning(false), _winner(false) {
+  : _board(board), _referee(board), _playerIndex(0), _isRunning(false), _winner(false), _info("") {
 
     _playerColors.push_back(sf::Color::White);
     _playerColors.push_back(sf::Color::Black);
@@ -21,10 +21,71 @@ void            GameEngine::loadAssets() {
   _textures["button1"].loadFromFile("./assets/capture.png");
   _textures["button2"].loadFromFile("./assets/doubleThree.png");
   _textures["button3"].loadFromFile("./assets/reset.png");
+  _textures["button4"].loadFromFile("./assets/quit.png");
   _textures["paper"].loadFromFile("./assets/paper.jpg");
   _textures["paper"].setRepeated(true);
   _textures["background"].loadFromFile("./assets/background.jpg");
+  _textures["valid"].loadFromFile("./assets/valid.png");
   _font.loadFromFile("./assets/font.ttf");
+}
+
+void            GameEngine::resetBoard() {
+
+  for (auto i = 0; i < B_SIZE; i++) {
+    _board[i] = EMPTY;
+  }
+}
+
+void            GameEngine::changeCaptureRule() {
+
+  _referee.setCaptureRule(!_referee.getCaptureRule());
+}
+
+void            GameEngine::changeDbleThreeRule() {
+
+  _referee.setDoubleThreeRule(!_referee.getDoubleThreeRule());
+}
+
+void            GameEngine::initButtons() {
+
+  sf::RectangleShape  button(sf::Vector2f(488.0f, 295.0f));
+  button.setScale(sf::Vector2f(0.25f, 0.25f));
+
+  button.setTexture(&_textures["button1"]);
+  button.setPosition(sf::Vector2f(45.0F * 21, 45.0f * 18.0f));
+  _buttons.push_back(button);
+  _buttonFct[0] = &GameEngine::changeCaptureRule;
+  button.setTexture(&_textures["button2"]);
+  button.setPosition(sf::Vector2f(45.0F * 21 + 150.0f, 45.0f * 18.0f));
+  _buttons.push_back(button);
+  _buttonFct[1] = &GameEngine::changeDbleThreeRule;
+  button.setTexture(&_textures["button3"]);
+  button.setPosition(sf::Vector2f(45.0F * 21 + 300.0f, 45.0f * 18.0f));
+  _buttons.push_back(button);
+  _buttonFct[2] = &GameEngine::resetBoard;
+  button.setTexture(&_textures["button4"]);
+  button.setPosition(sf::Vector2f(45.0F * 21 + 450.0f, 45.0f * 18.0f));
+  _buttons.push_back(button);
+  _buttonFct[3] = &GameEngine::stop;
+}
+
+void            GameEngine::drawRulesState() {
+
+  sf::RectangleShape v(sf::Vector2f(100.0f, 100.0f));
+  v.setScale(sf::Vector2f(0.5f, 0.5f));
+  v.setTexture(&_textures["valid"]);
+
+  if (_referee.getCaptureRule() == true)
+    {
+      v.setPosition(sf::Vector2f(45 * 20 + 100, 45.0f * 16.0f));
+      _win->draw(v);
+    }
+  if (_referee.getDoubleThreeRule() == true)
+    {
+      v.setPosition(sf::Vector2f(45 * 20 + 250, 45.0f * 16.0f));
+      _win->draw(v);
+    }
+
 }
 
 void            GameEngine::run() {
@@ -51,7 +112,7 @@ void            GameEngine::run() {
   r2.setTexture(&_textures["paper"]);
   text.setFont(_font);
   errorText.setFont(_font);
-
+  initButtons();
   text.setPosition(45 * 21 + 100, 45);
   errorText.setPosition(45 * 21 + 25.0f, 45 * 15);
   for (auto i = 0; i <= 20; i++) {
@@ -69,15 +130,9 @@ void            GameEngine::run() {
       _win->draw(r2);
       _win->draw(a);
       _win->draw(b);
-      button.setPosition(sf::Vector2f(21.0f * 45.0f + 25.0f, 45.0f * 18.0f));
-      button.setTexture(&_textures["button1"]);
-      _win->draw(button);
-      button.setPosition(sf::Vector2f(21.0f * 45.0f + button.getGlobalBounds().width + 50.0f, 45.0f * 18.0f));
-      button.setTexture(&_textures["button2"]);
-      _win->draw(button);
-      button.setPosition(sf::Vector2f(21.0f * 45.0f + button.getGlobalBounds().width * 2 + 75.0f, 45.0f * 18.0f));
-      button.setTexture(&_textures["button3"]);
-      _win->draw(button);
+      for (auto it = _buttons.begin(); it != _buttons.end(); it++)
+        _win->draw(*it);
+      drawRulesState();
       if (treatEvent(s) == true)
           stop();
       sf::CircleShape pawn(10.0f);
@@ -91,7 +146,11 @@ void            GameEngine::run() {
           }
         }
       errorText.setString(s);
-      text.setString(_playerIndex % 2 == 0 ? "Player 1" : "Player 2");
+      if (_info.size() < 1) {
+        text.setColor(_playerIndex % 2 == 0 ? sf::Color::White : sf::Color::Black);
+        text.setString(_playerIndex % 2 == 0 ? "Player 1" : "Player 2");
+      }
+      else text.setString(_info);
       _win->draw(errorText);
       _win->draw(text);
       _win->display();
@@ -143,15 +202,31 @@ bool            GameEngine::treatEvent(std::string& s) {
   return false;
 }
 
+bool            GameEngine::getButtonTarget() {
+
+  int i = 0;
+  for (auto it = _buttons.begin(); it != _buttons.end(); it++)
+  {
+    if (i < 4 && (*it).getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(*_win)))) {
+    (this->*_buttonFct[i])();
+    return true;
+  }
+    ++i;
+  }
+  return false;
+}
+
 bool            GameEngine::treatAction(std::string& s) {
 
   sf::Vector2i  p(0, 0);
 
-   s = "";
-  if (getTarget(p) == false)
+  if (_winner == true)
     {
-      return false;
+      _info = std::string("Press Reset Game to restart");
+      return true;
     }
+  if (getTarget(p) == false)
+    return getButtonTarget();
   try
   {
     _referee.putPieceOnBoard(p.x - 1, p.y - 1, (_playerIndex % 2) + 1 + 48);

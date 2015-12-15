@@ -24,8 +24,11 @@ public:
 public:
 
 	int		getWinner() const;
-
-
+	void 	setDoubleThreeRule(bool const& b);
+	void  setCaptureRule(bool const& b);
+	bool  getDoubleThreeRule() const;
+	bool 	getCaptureRule() const;
+	
 public:
 
 	void	putPieceOnBoard(int x, int y, char player);
@@ -58,6 +61,11 @@ private:
 	int					_winner;
 	std::pair<int, int> _lastPiece;
 	std::vector<int>	_jail;
+
+private:
+
+	bool				_cDbleThree;
+	bool				_cCapture;
 
 };
 
