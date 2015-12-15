@@ -20,7 +20,8 @@
 # define EMPTY		'0'
 # define PLAYER1	'1'
 # define PLAYER2	'2'
-# define INHIBITED	'3'
+# define INHIBITED1	'3'
+# define INHIBITED2 '4'
 # define POS(x,y)	((MAX_WIDTH * y) + x)
 
 class			Board {

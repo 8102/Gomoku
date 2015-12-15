@@ -33,7 +33,7 @@ char    Board::operator[](unsigned int position) const {
 }
 
 bool		Board::setCase(int x, int y, char status) {
-  if (_board[POS(x,y)] == INHIBITED)
+  if (_board[POS(x,y)] == INHIBITED1 || _board[POS(x,y)] == INHIBITED2)
     return (false);
   _board[POS(x,y)] = status;
   return (true);

@@ -45,11 +45,11 @@ void	Referee::_checkDoubleThree(int x, int y, char player) const
 	if (_board.getCase(x, y) == player + DOUBLE_THREE_RULE)
 		throw DoubleThreeRule("Forbidden position on (" + std::to_string(x) + ", " + std::to_string(y) + ").");
 	_board.setCase(x, y, player);
-	for (int i = 0; i <= 2 * SEARCH_RADIUS; ++i)
+	for (int i = 0; i <= 2 * SEARCH_RADIUS + 2; ++i)
 	{
-		for (int j = 0; j <= 2 * SEARCH_RADIUS; ++j)
+		for (int j = 0; j <= 2 * SEARCH_RADIUS + 2; ++j)
 		{
-			int current_x = x - SEARCH_RADIUS + j, current_y = y - SEARCH_RADIUS + i;
+			int current_x = x - SEARCH_RADIUS - 1 + j, current_y = y - SEARCH_RADIUS - 1 + i;
 			if (current_x >= 0 && current_y >= 0 && current_x < MAX_WIDTH && current_y < MAX_HEIGHT)
 			{
 				if (_board.getCase(current_x, current_y) ==  EMPTY)
@@ -80,93 +80,49 @@ int		Referee::_lineSum(char c1, char c2, char c3, char c4, char player) const
 	return (sum);
 }
 
+bool	Referee::_freeThreePattern(char c1, char c2, char c3, char c4, char c5, char player) const
+{
+	if ((c1 == EMPTY || c1 + player == 5) && c2 == player && c3 == player && (c4 == EMPTY || c4 + player == 5))
+		return (true);
+	if ((c1 == EMPTY || c1 + player == 5) && (c2 == EMPTY || c2 + player == 5) && c3 == player && c4 == player && (c5 == EMPTY || c5 + player == 5))
+		return (true);
+	if ((c1 == EMPTY || c1 + player == 5) && c2 == player && (c3 == EMPTY || c3 + player == 5) && c4 == player && (c5 == EMPTY || c5 + player == 5))
+		return (true);
+	return (false);
+}
+
 bool	Referee::_freeThree(int x, int y, char player, enum direction dir) const
 {
-	int sp_x = x, sp_y = y;
-
 	switch (dir)
 	{
 		case LINE:
-			sp_x = x - SEARCH_RADIUS;
+			if (_freeThreePattern(_board.getCase(x - 1, y), _board.getCase(x + 1, y), _board.getCase(x + 2, y), _board.getCase(x + 3, y), _board.getCase(x + 4, y), player) ||
+			    _freeThreePattern(_board.getCase(x - 4, y), _board.getCase(x - 3, y), _board.getCase(x - 2, y), _board.getCase(x - 1, y), _board.getCase(x + 1, y), player) ||
+				_freeThreePattern(_board.getCase(x - 2, y), _board.getCase(x - 1, y), _board.getCase(x + 1, y), _board.getCase(x + 2, y), _board.getCase(x + 3, y), player))
+				return (true);
 			break;
 		case COLUMN:
-			sp_y = y - SEARCH_RADIUS;
+			if (_freeThreePattern(_board.getCase(x, y - 1), _board.getCase(x, y + 1), _board.getCase(x, y + 2), _board.getCase(x, y + 3), _board.getCase(x, y + 4), player) ||
+			    _freeThreePattern(_board.getCase(x, y - 4), _board.getCase(x, y - 3), _board.getCase(x, y - 2), _board.getCase(x, y - 1), _board.getCase(x, y + 1), player) ||
+				_freeThreePattern(_board.getCase(x, y - 2), _board.getCase(x, y - 1), _board.getCase(x, y + 1), _board.getCase(x, y + 2), _board.getCase(x, y + 3), player))
+				return (true);
 			break;
 		case MAIN_DIAGONAL:
-			sp_x = x - SEARCH_RADIUS;
-			sp_y = y - SEARCH_RADIUS;
+			if (_freeThreePattern(_board.getCase(x - 1, y - 1), _board.getCase(x + 1, y + 1), _board.getCase(x + 2, y + 2), _board.getCase(x + 3, y + 3), _board.getCase(x + 4, y + 4), player) ||
+			    _freeThreePattern(_board.getCase(x - 4, y - 4), _board.getCase(x - 3, y - 3), _board.getCase(x - 2, y - 2), _board.getCase(x - 1, y - 1), _board.getCase(x + 1, y + 1), player) ||
+				_freeThreePattern(_board.getCase(x - 2, y - 2), _board.getCase(x - 1, y - 1), _board.getCase(x + 1, y + 1), _board.getCase(x + 2, y + 2), _board.getCase(x + 3, y + 3), player))
+				return (true);
 			break;
 		case SECONDARY_DIAGONAL:
-			sp_x = x + SEARCH_RADIUS;
-			sp_y = y + SEARCH_RADIUS;
+			if (_freeThreePattern(_board.getCase(x - 4, y + 4), _board.getCase(x - 3, y + 3), _board.getCase(x - 2, y + 2), _board.getCase(x - 1, y + 1), _board.getCase(x + 1, y - 1), player) ||
+			    _freeThreePattern(_board.getCase(x - 1, y + 1), _board.getCase(x + 1, y - 1), _board.getCase(x + 2, y - 2), _board.getCase(x + 3, y - 3), _board.getCase(x + 4, y - 4), player) ||
+				_freeThreePattern(_board.getCase(x - 2, y + 2), _board.getCase(x - 1, y + 1), _board.getCase(x + 1, y - 1), _board.getCase(x + 2, y - 2), _board.getCase(x + 3, y - 3), player))
+				return (true);
 			break;
 		default:
 			std::cerr << "[ERROR]: In Referee instance -> _freeThree: unknown direction" << std::endl;
 			break;
-	}
-	while (sp_x != x && sp_y != y)
-	{
-		switch (dir)
-		{
-			case LINE:
-				if (_lineSum(_board.getCase(sp_x, sp_y),
-				    		_board.getCase(sp_x + 1, sp_y),
-				    		_board.getCase(sp_x + 2, sp_y),
-				    		_board.getCase(sp_x + 3, sp_y),
-				    		player) == 3 &&
-					(_board.getCase(sp_x - 1, sp_y) == EMPTY ||
-					_board.getCase(sp_x - 1, sp_y) + player == 5) &&
-					(_board.getCase(sp_x + 4, sp_y) == EMPTY ||
-					 _board.getCase(sp_x + 4, sp_y) + player == 5))
-					return (true);
-				sp_x += 1;
-				break;
-			case COLUMN:
-				if (_lineSum(_board.getCase(sp_x, sp_y),
-				    		_board.getCase(sp_x, sp_y + 1),
-				    		_board.getCase(sp_x, sp_y + 2),
-				    		_board.getCase(sp_x, sp_y + 3),
-				    		player) == 3 &&
-					(_board.getCase(sp_x, sp_y - 1) == EMPTY ||
-					_board.getCase(sp_x, sp_y - 1) + player == 5) &&
-					(_board.getCase(sp_x, sp_y + 4) == EMPTY ||
-					 _board.getCase(sp_x, sp_y + 4) + player == 5))
-					return (true);
-				sp_y += 1;
-				break;
-			case MAIN_DIAGONAL:
-				if (_lineSum(_board.getCase(sp_x, sp_y),
-				    		_board.getCase(sp_x + 1, sp_y + 1),
-				    		_board.getCase(sp_x + 2, sp_y + 1),
-				    		_board.getCase(sp_x + 3, sp_y + 1),
-				    		player) == 3 &&
-					(_board.getCase(sp_x - 1, sp_y - 1) == EMPTY ||
-					_board.getCase(sp_x - 1, sp_y - 1) + player == 5) &&
-					(_board.getCase(sp_x + 4, sp_y + 4) == EMPTY ||
-					 _board.getCase(sp_x + 4, sp_y + 4) + player == 5))
-					return (true);
-				sp_x += 1;
-				sp_y += 1;
-				break;
-			case SECONDARY_DIAGONAL:
-				if (_lineSum(_board.getCase(sp_x, sp_y),
-				    		_board.getCase(sp_x - 1, sp_y - 1),
-				    		_board.getCase(sp_x - 2, sp_y - 2),
-				    		_board.getCase(sp_x - 3, sp_y - 3),
-				    		player) == 3 &&
-					(_board.getCase(sp_x + 1, sp_y + 1) == EMPTY ||
-					_board.getCase(sp_x + 1, sp_y + 1) + player == 5) &&
-					(_board.getCase(sp_x - 4, sp_y - 4) == EMPTY ||
-					 _board.getCase(sp_x - 4, sp_y - 4) + player == 5))
-					return (true);
-				sp_x -= 1;
-				sp_y -= 1;
-				break;
-			default:
-				std::cerr << "[ERROR]: In Referee instance -> _freeThree: unknown direction" << std::endl;
-				break;
-		}		
-	}
+	}		
 	return (false);
 }
 
@@ -218,7 +174,7 @@ bool		Referee::_fivePieceAligned(int x, int y, std::vector<enum direction> &dirs
 bool			Referee::_isBreakable(int x, int y, enum direction dir) const
 {
 	int sp_x = x, sp_y = y;
-	char player = _board.getCase(x, y), enemy = player % 2 + 1;
+	char player = _board.getCase(x, y), enemy = player % 2 + 1 + '0';
 
 	for (unsigned char i = 0; i < 5; ++i)
 	{
@@ -282,6 +238,10 @@ void	Referee::_checkWinner()
 {
 	std::vector<enum direction>	dirs;
 
+	if (_jail[0] == 10)
+		_winner = PLAYER1;
+	if (_jail[1] == 10)
+		_winner = PLAYER2;
 	for (int i = 0; i < MAX_HEIGHT; ++i)
 	{
 		for (int j = 0; j < MAX_WIDTH; ++j)
@@ -313,56 +273,64 @@ void	Referee::_removeDoubleThree(int x1, int y1, int x2, int y2, char player) co
 	}
 }
 
-void	Referee::_checkCapturedPawn(int x, int y) const
+void	Referee::_checkCapturedPawn(int x, int y)
 {
-	char player = _board.getCase(x, y), enemy = player % 2 + 1;
+	char player = _board.getCase(x, y), enemy = player % 2 + 1 + '0';
 
 	if (_board.getCase(x + 1, y) == enemy && _board.getCase(x + 2, y) == enemy && _board.getCase(x + 3, y) == player)
 	{
 		_board.setCase(x + 1, y, EMPTY);
 		_board.setCase(x + 2, y, EMPTY);
+		_jail[player - '0' - 1] += 2;
 		_removeDoubleThree(x + 1, y, x + 2, y, enemy);
 	}
 	if (_board.getCase(x - 1, y) == enemy && _board.getCase(x - 2, y) == enemy && _board.getCase(x - 3, y) == player)
 	{
 		_board.setCase(x - 1, y, EMPTY);
 		_board.setCase(x - 2, y, EMPTY);		
+		_jail[player - '0' - 1] += 2;
 		_removeDoubleThree(x - 1, y, x - 2, y, enemy);
 	}
 	if (_board.getCase(x, y + 1) == enemy && _board.getCase(x, y + 2) == enemy && _board.getCase(x, y + 3) == player)
 	{
 		_board.setCase(x, y + 1, EMPTY);
 		_board.setCase(x, y + 2, EMPTY);
+		_jail[player - '0' - 1] += 2;
 		_removeDoubleThree(x, y + 1, x, y + 2, enemy);
 	}
 	if (_board.getCase(x, y - 1) == enemy && _board.getCase(x, y - 2) == enemy && _board.getCase(x, y - 3) == player)
 	{
 		_board.setCase(x, y - 1, EMPTY);
 		_board.setCase(x, y - 2, EMPTY);
+		_jail[player - '0' - 1] += 2;
 		_removeDoubleThree(x, y - 1, x, y - 2, enemy);
 	}
 	if (_board.getCase(x + 1, y + 1) == enemy && _board.getCase(x + 2, y + 2) == enemy && _board.getCase(x + 3, y + 3) == player)
 	{
 		_board.setCase(x + 1, y + 1, EMPTY);
 		_board.setCase(x + 2, y + 2, EMPTY);
+		_jail[player - '0' - 1] += 2;
 		_removeDoubleThree(x + 1, y + 1, x + 2, y + 2, enemy);
 	}
 	if (_board.getCase(x - 1, y - 1) == enemy && _board.getCase(x - 2, y - 2) == enemy && _board.getCase(x - 3, y - 3) == player)
 	{
 		_board.setCase(x - 1, y - 1, EMPTY);
 		_board.setCase(x - 2, y - 2, EMPTY);
+		_jail[player - '0' - 1] += 2;
 		_removeDoubleThree(x - 1, y - 1, x - 2, y - 2, enemy);
 	}
 	if (_board.getCase(x + 1, y - 1) == enemy && _board.getCase(x + 2, y - 2) == enemy && _board.getCase(x + 3, y - 3) == player)
 	{
 		_board.setCase(x + 1, y - 1, EMPTY);
 		_board.setCase(x + 2, y - 2, EMPTY);
+		_jail[player - '0' - 1] += 2;
 		_removeDoubleThree(x + 1, y - 1, x + 2, y - 2, enemy);
 	}
 	if (_board.getCase(x - 1, y + 1) == enemy && _board.getCase(x - 2, y + 2) == enemy && _board.getCase(x - 3, y + 3) == player)
 	{
 		_board.setCase(x - 1, y + 1, EMPTY);
 		_board.setCase(x - 2, y + 2, EMPTY);
+		_jail[player - '0' - 1] += 2;
 		_removeDoubleThree(x - 1, y + 1, x - 2, y + 2, enemy);
 	}
 }
