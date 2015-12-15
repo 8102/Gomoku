@@ -23,6 +23,11 @@ int		Referee::getWinner() const
 	return (_winner);
 }
 
+void 	Referee::resetWinner() {
+
+	_winner = 0;
+}
+
 void Referee::setDoubleThreeRule(bool const& b) {
 
 	_cDbleThree = b;

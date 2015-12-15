@@ -31,6 +31,9 @@ void            GameEngine::loadAssets() {
 
 void            GameEngine::resetBoard() {
 
+  _winner = false;
+  _info = "";
+  _referee.resetWinner();
   for (auto i = 0; i < B_SIZE; i++) {
     _board[i] = EMPTY;
   }
@@ -162,6 +165,7 @@ bool            GameEngine::getTarget(sf::Vector2i& target)
   sf::Vector2f  location = sf::Vector2f(sf::Mouse::getPosition(*_win));
   sf::FloatRect bounds(sf::FloatRect(location.x - 5, location.y - 5, location.x + 5, location.y + 5));
 
+  if (_winner == true) return false;
   for (auto i = 1; i < 20; i++)
     for (auto j = 1; j < 20; j++)
       {
@@ -221,12 +225,10 @@ bool            GameEngine::treatAction(std::string& s) {
   sf::Vector2i  p(0, 0);
 
   if (_winner == true)
-    {
-      _info = std::string("Press Reset Game to restart");
-      return true;
-    }
+    _info = std::string("Press Reset Game to restart");
   if (getTarget(p) == false)
     return getButtonTarget();
+  s = "";
   try
   {
     _referee.putPieceOnBoard(p.x - 1, p.y - 1, (_playerIndex % 2) + 1 + 48);
