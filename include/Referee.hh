@@ -29,6 +29,7 @@ public:
 	void  setCaptureRule(bool const& b);
 	bool  getDoubleThreeRule() const;
 	bool 	getCaptureRule() const;
+	std::vector<int> const &getJail() const;
 
 public:
 

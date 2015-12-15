@@ -47,6 +47,12 @@ bool Referee::getCaptureRule() const {
 
 	return _cCapture;
 }
+
+std::vector<int> const &Referee::getJail() const
+{
+	return (_jail);
+}
+
 /*
 ** Public methodes
 */
