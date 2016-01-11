@@ -32,11 +32,8 @@ char&    Board::operator[](unsigned int position) {
   return _board[position];
 }
 
-bool		Board::setCase(int x, int y, char status) {
-  if (_board[POS(x,y)] == INHIBITED1 || _board[POS(x,y)] == INHIBITED2)
-    return (false);
+void		Board::setCase(int x, int y, char status) {
   _board[POS(x,y)] = status;
-  return (true);
 }
 
 bool		Board::boardIsFull() const {

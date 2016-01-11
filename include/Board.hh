@@ -39,7 +39,7 @@ public:
   char			getCase(int, int) const;
 
   // Setters
-  bool			setCase(int, int, char);
+  void			setCase(int, int, char);
 
   // Board routines
   bool			boardIsFull() const;
