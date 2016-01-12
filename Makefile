@@ -1,4 +1,4 @@
-NAME 		=	gomoku
+NAME 			=	gomoku
 
 GRAPHICALGAME	=	yes
 
@@ -6,12 +6,12 @@ GRAPHICALGAME	=	yes
 #			BASICS				#
 #########################################################
 
-CC	=	g++
-RM	=	rm -f
+CC		=	g++
+RM		=	rm -f
 RMDIR	=	rm -rf
 ECHO	=	echo -ne
 LINK	=	ln -fs
-CAT	=	cat
+CAT		=	cat
 
 COLOR_OFF	=	"\033[0m"
 COLOR_1		=	"\033[1;32m"
@@ -30,22 +30,26 @@ LINKING		=	yes
 #########################################################
 
 CXXFLAGS		=		-W -Wall -Wextra -ansi -std=c++11	\
-							-I$(INCLUDE_DIR)	\
-							-I$(GRAPHICS_INC_DIR)	\
+							-I$(GAME_INC_DIR)				\
+							-I$(GRAPHICS_INC_DIR)			\
 
-MAKEFLAGS		+=	--warn-undefined-variables		\
-								--warn-unused-variables				\
+MAKEFLAGS		+=	--warn-undefined-variables				\
+								--warn-unused-variables		\
 								--no-print-directory
 
 LFLAGS			= 	-lsfml-system -lsfml-graphics -lsfml-window -lsfml-audio
 
-INCLUDE_DIR	=		./include/
-BINARY_DIR	=		./bin/
+INCLUDE_DIR		=		./include/
+BINARY_DIR		=		./bin/
 SRC_DIR			=		./src/
 OBJ_DIR			=		./obj/
 
-BASE_OBJS		=	$(addsuffix .o, $(basename $(subst $(SRC_DIR), $(OBJ_DIR), $(BASE_SRCS))))
-BASE_SRCS		=	$(addprefix $(SRC_DIR), $(BASE_SRC))
+
+GAME_SRC_DIR	=	$(addprefix $(SRC_DIR), game/)
+GAME_OBJ_DIR	=	$(addprefix $(OBJ_DIR), game/)
+GAME_INC_DIR	=	$(addprefix $(INCLUDE_DIR), game/)
+GAME_OBJS		=	$(addsuffix .o, $(basename $(subst $(GAME_SRC_DIR), $(GAME_OBJ_DIR), $(GAME_SRCS))))
+GAME_SRCS		=	$(addprefix $(GAME_SRC_DIR), $(GAME_SRC))
 
 GRAPHICS_SRC_DIR	=	$(addprefix $(SRC_DIR), graphic/)
 GRAPHICS_OBJ_DIR	=	$(addprefix $(OBJ_DIR), graphic/)
@@ -53,34 +57,35 @@ GRAPHICS_INC_DIR	=	$(addprefix $(INCLUDE_DIR), graphic/)
 GRAPHICS_SRCS		=	$(addprefix $(GRAPHICS_SRC_DIR), $(GRAPHICS_SRC))
 GRAPHICS_OBJS		=	$(addsuffix .o, $(basename $(subst $(GRAPHICS_SRC_DIR), $(GRAPHICS_OBJ_DIR), $(GRAPHICS_SRCS))))
 
-BASE_SRC		?=	main.cpp\
-				Board.cpp\
-				Player.cpp\
-				Error.cpp\
-				Referee.cpp\
-				Game.cpp
+GAME_SRC		?=	main.cpp	\
+					Board.cpp	\
+					Player.cpp	\
+					Error.cpp	\
+					Referee.cpp	\
+					Game.cpp
 
-GRAPHICS_SRC		?=	GameEngine.cpp				\
+GRAPHICS_SRC	?=	GameEngine.cpp	\
 
 
-#GRAPHICS_SRC+=			initMenu.cpp					\
+#GRAPHICS_SRC	+=			initMenu.cpp	\
 
-UNITTEST 				?=	false
+UNITTEST 		?=	false
 
 PRO				=	$(addprefix $(BINARY_DIR), $(NAME))
 
-OBJS			=		$(BASE_OBJS)								\
+OBJS			=		$(GAME_OBJS)								\
 							$(GRAPHICS_OBJS)						\
 
-SRCS			=		$(BASE_SRC)									\
+SRCS			=		$(GAME_SRC)									\
 							$(GRAPHICS_SRCS)						\
 
 
-FIRST		:=	$(shell test -d $(BINARY_DIR)				|| mkdir $(BINARY_DIR))				\
-						$(shell test -d $(OBJ_DIR)					|| mkdir $(OBJ_DIR))					\
-						$(shell test -d $(GRAPHICS_OBJ_DIR)	|| mkdir $(GRAPHICS_OBJ_DIR))	\
+FIRST		:=	$(shell test -d $(BINARY_DIR)				|| mkdir $(BINARY_DIR))		\
+					$(shell test -d $(OBJ_DIR)					|| mkdir $(OBJ_DIR))	\
+					$(shell test -d $(GRAPHICS_OBJ_DIR)	|| mkdir $(GRAPHICS_OBJ_DIR))	\
+					$(shell test -d $(GAME_OBJ_DIR)	|| mkdir $(GAME_OBJ_DIR))			\
 
-all		:		$(FIRST)
+all			:	$(FIRST)
 					@$(ECHO) $(COLOR_4) "\n\nCompiling in "$(COLOR_2)"[ "$(COLOR_6)"RELEASE "$(COLOR_2)"]"$(COLOR_4)" mode.\n\n"$(COLOR_OFF)
 					@$(MAKE) $(NAME) CC=$(CC) CXXFLAGS='$(CXXFLAGS)' MAKEFLAGS='$(MAKEFLAGS) -j4 -l4' UNITTEST=no
 
@@ -92,7 +97,7 @@ test		:	$(FIRST) fclean
 					@$(ECHO) $(COLOR_4) "\n\nCompiling in "$(COLOR_2)"[ "$(COLOR_6)"TESTING "$(COLOR_2)"]"$(COLOR_4)" mode.\n\n"$(COLOR_OFF)
 					@$(MAKE) $(NAME) CC=$(CC) CXXFLAGS='$(CXXFLAGS) -g3' MAKEFLAGS='$(MAKEFLAGS) -j4 -l4' UNITTEST=yes
 
-$(NAME)	:	$(PRO)
+$(NAME)		:	$(PRO)
 
 ifeq ($(LINKING), yes)
 			@$(LINK) $(PRO) $(NAME)
@@ -111,19 +116,19 @@ $(OBJ_DIR)%.o	:	$(SRC_DIR)%.cpp
 			@$(CC) $(CXXFLAGS) -c $< -o $@ $(LFLAGS)
 			@$(ECHO) $(COLOR_8)"["$(COLOR_1)" OK "$(COLOR_8)"] "$(COLOR_5) ": " $< $(COLOR_OFF)"\n"
 
-$(PRO)		:	$(OBJS)
+$(PRO)			:	$(OBJS)
 			@$(ECHO) $(COLOR_8)"\n" "[" $(COLOR_1) " LINKING ... "$(COLOR_8)"]"$(COLOR_4)" >>>>>>>>>>>>>>>>>> "$(COLOR_OFF)
 			@$(CC) $(CXXFLAGS) $(OBJS) -o $(PRO) $(LFLAGS)
 			@$(ECHO) $(COLOR_8)"["$(COLOR_1) " Done. "$(COLOR_8)"]\n\n"$(COLOR_OFF)
 
-clean		:
+clean			:
 			@$(ECHO)	"\n\n"
 			@$(ECHO) $(COLOR_2)"[ "$(COLOR_6)"Deleting "$(COLOR_2)"] " $(COLOR_4)"Graphic source objects\n"$(COLOR_OFF)
 			@$(RM) $(GRAPHICS_OBJS)
 			@$(ECHO) $(COLOR_2)"[ "$(COLOR_6)"Deleting "$(COLOR_2)"] " $(COLOR_4)"Object directory\n"$(COLOR_OFF)
 			@$(RMDIR) $(OBJ_DIR)
 
-fclean		:	clean
+fclean			:	clean
 			@$(ECHO) $(COLOR_2)"[ "$(COLOR_6)"Deleting "$(COLOR_2)"] " $(COLOR_4)"Binary\n"$(COLOR_OFF)
 			@$(RM) $(NAME)
 			@$(ECHO) $(COLOR_2)"[ "$(COLOR_6)"Deleting "$(COLOR_2)"] " $(COLOR_4)"Binary directory\n"$(COLOR_OFF)
@@ -131,6 +136,6 @@ fclean		:	clean
 			@$(RM) $(PRO)
 			@$(ECHO) $(COLOR_2)"\n\n	[ "$(COLOR_6)"Done"$(COLOR_2)" ]\n"$(COLOR_OFF)
 
-re		:	fclean all
+re				:	fclean all
 
-.PHONY		:	all test debug clean fclean re
+.PHONY			:	all test debug clean fclean re
