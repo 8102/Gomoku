@@ -32,6 +32,7 @@ LINKING		=	yes
 CXXFLAGS		=		-W -Wall -Wextra -ansi -std=c++11	\
 							-I$(GAME_INC_DIR)				\
 							-I$(GRAPHICS_INC_DIR)			\
+							-I$(AI_INC_DIR)					\
 
 MAKEFLAGS		+=	--warn-undefined-variables				\
 								--warn-unused-variables		\
@@ -51,6 +52,12 @@ GAME_INC_DIR	=	$(addprefix $(INCLUDE_DIR), game/)
 GAME_OBJS		=	$(addsuffix .o, $(basename $(subst $(GAME_SRC_DIR), $(GAME_OBJ_DIR), $(GAME_SRCS))))
 GAME_SRCS		=	$(addprefix $(GAME_SRC_DIR), $(GAME_SRC))
 
+AI_SRC_DIR	=	$(addprefix $(SRC_DIR), AI/)
+AI_OBJ_DIR	=	$(addprefix $(OBJ_DIR), AI/)
+AI_INC_DIR	=	$(addprefix $(INCLUDE_DIR), AI/)
+AI_OBJS		=	$(addsuffix .o, $(basename $(subst $(AI_SRC_DIR), $(AI_OBJ_DIR), $(AI_SRCS))))
+AI_SRCS		=	$(addprefix $(AI_SRC_DIR), $(AI_SRC))
+
 GRAPHICS_SRC_DIR	=	$(addprefix $(SRC_DIR), graphic/)
 GRAPHICS_OBJ_DIR	=	$(addprefix $(OBJ_DIR), graphic/)
 GRAPHICS_INC_DIR	=	$(addprefix $(INCLUDE_DIR), graphic/)
@@ -64,6 +71,8 @@ GAME_SRC		?=	main.cpp	\
 					Referee.cpp	\
 					Game.cpp
 
+AI_SRC			?=	AI_MonteCarlo.cpp
+
 GRAPHICS_SRC	?=	GameEngine.cpp	\
 
 
@@ -75,15 +84,19 @@ PRO				=	$(addprefix $(BINARY_DIR), $(NAME))
 
 OBJS			=		$(GAME_OBJS)								\
 							$(GRAPHICS_OBJS)						\
+							$(AI_OBJS)								\
 
 SRCS			=		$(GAME_SRC)									\
 							$(GRAPHICS_SRCS)						\
+							$(AI_SRCS)								\
+
 
 
 FIRST		:=	$(shell test -d $(BINARY_DIR)				|| mkdir $(BINARY_DIR))		\
 					$(shell test -d $(OBJ_DIR)					|| mkdir $(OBJ_DIR))	\
 					$(shell test -d $(GRAPHICS_OBJ_DIR)	|| mkdir $(GRAPHICS_OBJ_DIR))	\
 					$(shell test -d $(GAME_OBJ_DIR)	|| mkdir $(GAME_OBJ_DIR))			\
+					$(shell test -d $(AI_OBJ_DIR)	|| mkdir $(AI_OBJ_DIR))			\
 
 all			:	$(FIRST)
 					@$(ECHO) $(COLOR_4) "\n\nCompiling in "$(COLOR_2)"[ "$(COLOR_6)"RELEASE "$(COLOR_2)"]"$(COLOR_4)" mode.\n\n"$(COLOR_OFF)

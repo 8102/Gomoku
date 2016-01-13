@@ -53,6 +53,11 @@ std::vector<int> const &Referee::getJail() const
 	return (_jail);
 }
 
+char	Referee::getCase(int x, int y) const
+{
+	return _board.getCase(x, y);
+}
+
 /*
 ** Public methodes
 */

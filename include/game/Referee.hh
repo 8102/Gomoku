@@ -24,12 +24,13 @@ public:
 public:
 
 	int		getWinner() const;
-	void  resetWinner();
+	void  	resetWinner();
 	void 	setDoubleThreeRule(bool const& b);
-	void  setCaptureRule(bool const& b);
-	bool  getDoubleThreeRule() const;
+	void  	setCaptureRule(bool const& b);
+	bool  	getDoubleThreeRule() const;
 	bool 	getCaptureRule() const;
 	std::vector<int> const &getJail() const;
+	char	getCase(int x, int y) const;
 
 public:
 

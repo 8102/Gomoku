@@ -14,7 +14,7 @@ class AI_MonteCarlo : public IAI
 {
 
 public:
-    AI_MonteCarlo(char player, Referee const &ref);
+    AI_MonteCarlo(char player, Referee &ref);
     ~AI_MonteCarlo();
 
 private:
@@ -24,8 +24,10 @@ private:
     bool                                                   _generateGame();
 
 private:
-    char            _player;
-    Referee const & _ref;
+    char                                    _player;
+    Referee &                                _ref;
+    std::default_random_engine              _generator;
+    std::uniform_int_distribution<int>      _distribution;
 };
 
 #endif // _AI_MONTE_CARLO_

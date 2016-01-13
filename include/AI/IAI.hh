@@ -5,6 +5,6 @@ class IAI
 {
 public:
     bool    playOneTurn();
-}
+};
 
 #endif // _IAI_HH
