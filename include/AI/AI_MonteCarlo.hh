@@ -7,8 +7,8 @@
 # include "IAI.hh"
 # include "Referee.hh"
 
-# define NUMBER_OF_POSSIBILITIES_MAX        200
-# define NUMBER_OF_SIMULATIONS_PER_PIECE    500
+# define NUMBER_OF_POSSIBILITIES_MAX        300
+# define NUMBER_OF_SIMULATIONS_PER_PIECE    100
 
 class AI_MonteCarlo : public IAI
 {
@@ -17,16 +17,20 @@ public:
     AI_MonteCarlo(char player, Referee &ref);
     ~AI_MonteCarlo();
 
+public:
+    bool        playOneTurn();
+
 private:
-    std::unique_ptr<std::vector<std::pair<int, int> > >    _getRandomFreePossibilities(unsigned int max = NUMBER_OF_POSSIBILITIES_MAX);
-    std::pair<int, int>                                    _getBestMove(std::unique_ptr<std::vector<std::pair<int, int> > > possibilities);
+    std::shared_ptr<std::vector<std::pair<int, int> > >    _getRandomFreePossibilities(unsigned int max = NUMBER_OF_POSSIBILITIES_MAX);
+    std::pair<int, int>                                    _getBestMove(std::shared_ptr<std::vector<std::pair<int, int> > > possibilities);
     float                                                  _generateGames(int x, int y, unsigned int max = NUMBER_OF_SIMULATIONS_PER_PIECE);
     bool                                                   _generateGame();
 
 private:
     char                                    _player;
-    Referee &                                _ref;
-    std::default_random_engine              _generator;
+    Referee &                               _ref;
+    std::random_device                      _rd;
+    std::mt19937                            _mt;
     std::uniform_int_distribution<int>      _distribution;
 };
 

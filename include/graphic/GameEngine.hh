@@ -6,6 +6,7 @@
 #include      "Board.hh"
 #include      "common.hpp"
 #include      "Referee.hh"
+#include      "AI_MonteCarlo.hh"
 #include      <sstream>
 
 # define      DEFAULT_WIN_W  1600
@@ -42,8 +43,9 @@ public:
   void        setJailsText(std::string&, std::string&);
 private:
 
-  Board&      _board;
-  Referee     _referee;
+  Board&         _board;
+  Referee        _referee;
+  AI_MonteCarlo  _ai;
 
 private:
 
@@ -60,9 +62,10 @@ private:
 
 private:
 
-  bool      _isRunning;
-  bool      _winner;
-  std::string _info;
+  bool          _isRunning;
+  bool          _winner;
+  std::string   _info;
+
 };
 
 #endif         /* !___GAME_ENGINE_HH___ */

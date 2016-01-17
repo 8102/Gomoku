@@ -1,7 +1,7 @@
 #include      "GameEngine.hh"
 
 GameEngine::GameEngine(Board& board)
-  : _board(board), _referee(board), _playerIndex(0), _isRunning(false), _winner(false), _info("") {
+  : _board(board), _referee(board), _ai('2', _referee), _playerIndex(0), _isRunning(false), _winner(false), _info("") {
 
     _playerColors.push_back(sf::Color::White);
     _playerColors.push_back(sf::Color::Black);
@@ -33,10 +33,7 @@ void            GameEngine::resetBoard() {
 
   _winner = false;
   _info = "";
-  _referee.resetWinner();
-  for (auto i = 0; i < B_SIZE; i++) {
-    _board[i] = EMPTY;
-  }
+  _referee.resetGame();
 }
 
 void            GameEngine::changeCaptureRule() {
@@ -94,13 +91,13 @@ void            GameEngine::drawRulesState() {
 void            GameEngine::setJailsText(std::string& s1, std::string& s2) {
 
   std::stringstream ss;
-  const std::vector<int>&  v = _referee.getJail();
+  char const *v = _referee.getJail();
 
-  ss << v[0];
+  ss << static_cast<int>(v[0]);
   s1 = "Player 1 captured pawns : ";
   s1 += ss.str();
   ss.str("");
-  ss << v[1];
+  ss << static_cast<int>(v[1]);
   s2 = "Player 2 captured pawns : ";
   s2 += ss.str();
 }
@@ -164,6 +161,11 @@ void            GameEngine::run() {
       for (auto it = _buttons.begin(); it != _buttons.end(); it++)
         _win->draw(*it);
       drawRulesState();
+      if (_playerIndex % 2 == 1)
+      {
+          _ai.playOneTurn();
+          ++_playerIndex;
+      }
       if (treatEvent(s) == true)
           stop();
       sf::CircleShape pawn(10.0f);

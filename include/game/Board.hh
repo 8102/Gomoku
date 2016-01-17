@@ -12,22 +12,24 @@
 # define BOARD_HPP_
 
 # include <cstring>
+# include <algorithm>
 
 // Macros
 # define MAX_HEIGHT	19
 # define MAX_WIDTH	19
-# define B_SIZE		(MAX_HEIGHT * MAX_WIDTH)
-# define EMPTY		'0'
-# define PLAYER1	'1'
-# define PLAYER2	'2'
+# define B_SIZE     (MAX_HEIGHT * MAX_WIDTH)
+# define JAIL_SIZE  2
+# define WIN_SIZE   1
+# define EMPTY		  '0'
+# define PLAYER1    '1'
+# define PLAYER2    '2'
 # define INHIBITED1	'3'
 # define INHIBITED2 '4'
-# define POS(x,y)	((MAX_WIDTH * y) + x)
+# define POS(x,y)	  ((MAX_WIDTH * y) + x)
 
 class			Board {
 private:
-  char			_board[B_SIZE];
-  //Graphic		_graphicBoard;
+  char			_board[B_SIZE + JAIL_SIZE + WIN_SIZE];
 
 public:
   // Ctor & Dtor
@@ -36,13 +38,20 @@ public:
 
   // Getters
   const char*		getBoard() const;
-  char			getCase(int, int) const;
+  char			    getCase(int, int) const;
+  char          getWinnerCase() const;
+  const char*   getJail() const;
+  char          getJail(char player) const;
 
   // Setters
   void			setCase(int, int, char);
+  void      setBoard(char const *);
+  void      setWinnerCase(char winner);
 
   // Board routines
   bool			boardIsFull() const;
+  void      addInJail(unsigned short int player);
+  void      reset();
 
 public:
 

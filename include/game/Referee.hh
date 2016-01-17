@@ -5,6 +5,7 @@
 # include <string>
 # include <iostream>
 # include <vector>
+# include <algorithm>
 # include "Board.hh"
 # include "Error.hh"
 
@@ -29,12 +30,16 @@ public:
 	void  	setCaptureRule(bool const& b);
 	bool  	getDoubleThreeRule() const;
 	bool 	getCaptureRule() const;
-	std::vector<int> const &getJail() const;
+	char const *getJail();
 	char	getCase(int x, int y) const;
 
 public:
 
 	void	putPieceOnBoard(int x, int y, char player);
+	void 	resetCell(int x, int y, char player);
+	void 	saveBoard();
+	void 	resetBoardLastSave();
+	void 	resetGame();
 
 private:
 	enum direction
@@ -61,14 +66,14 @@ private:
 private:
 
 	Board				&_board;
-	int					_winner;
-	std::pair<int, int> _lastPiece;
-	std::vector<int>	_jail;
 
 private:
 
 	bool				_cDbleThree;
 	bool				_cCapture;
+
+private:
+	char				_save[B_SIZE + JAIL_SIZE + WIN_SIZE];
 
 };
 

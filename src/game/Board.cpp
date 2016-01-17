@@ -8,15 +8,18 @@
 // Last update Thu Dec  3 17:19:23 2015 Guiz
 //
 
+#include <iostream>
 #include "Board.hh"
 
+// Ctor & Dtor
 Board::Board() {
-  memset(_board, EMPTY, B_SIZE);
-  //_graphicBoard;
+  std::memset(_board, EMPTY, B_SIZE);
+  std::memset(_board + B_SIZE, 0, JAIL_SIZE + WIN_SIZE);
 }
 
 Board::~Board() {}
 
+// Getters
 const char*	Board::getBoard() const {
   return (_board);
 }
@@ -27,13 +30,41 @@ char		Board::getCase(int x, int y) const {
   return (_board[POS(x,y)]);
 }
 
-char&    Board::operator[](unsigned int position) {
-
-  return _board[position];
+char    Board::getWinnerCase() const {
+  return (_board[B_SIZE + JAIL_SIZE]);
 }
 
+const char*   Board::getJail() const {
+  return (_board + B_SIZE);
+}
+
+char          Board::getJail(char player) const {
+  return (_board[B_SIZE + player - 1]);
+}
+
+// Setters
 void		Board::setCase(int x, int y, char status) {
+  if (x < 0 || y < 0 || x >= MAX_WIDTH || y >= MAX_HEIGHT)
+    return;
   _board[POS(x,y)] = status;
+}
+
+/*
+** C'est dans cette fonction que tout se passe. Si tu enlève WIN_SIZE,
+** tu peux recompiler, tu vas voir c'est instantanné...
+*/
+void    Board::setBoard(char const *board) {
+  // std::copy(board, board + B_SIZE + JAIL_SIZE + WIN_SIZE, _board);
+  std::memcpy(_board, board, B_SIZE + JAIL_SIZE + WIN_SIZE);
+}
+
+void    Board::setWinnerCase(char winner) {
+  _board[B_SIZE + JAIL_SIZE] = winner;
+}
+
+// Board routines
+char&    Board::operator[](unsigned int position) {
+  return _board[position];
 }
 
 bool		Board::boardIsFull() const {
@@ -45,4 +76,15 @@ bool		Board::boardIsFull() const {
       check = false;
   }
   return (check);
+}
+
+void      Board::addInJail(unsigned short int player) {
+  if (player > 2)
+    return;
+  _board[B_SIZE + player - 1] += 2;
+}
+
+void      Board::reset() {
+  std::memset(_board, EMPTY, B_SIZE);
+  std::memset(_board + B_SIZE, 0, JAIL_SIZE + WIN_SIZE);
 }
