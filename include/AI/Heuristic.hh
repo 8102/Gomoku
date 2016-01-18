@@ -52,7 +52,7 @@ namespace             Heuristic
     /* inscribe Influencial Mapping Weight on a cell according to the links it can provide */
     char              AknowledgedCell(int x, int y);
     /* Inscribe Knowledge representation in the current Boards Cell */ /* Heavy on first call, undoubtably much lighter after */
-    bool              AknowledgeBoard(std::unique_ptr<char>& )
+    bool              AknowledgeBoard(std::unique_ptr<char>& board);
 
     /*
     ** */
