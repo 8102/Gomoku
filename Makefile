@@ -30,6 +30,7 @@ LINKING		=	yes
 #########################################################
 
 CXXFLAGS		=		-W -Wall -Wextra -ansi -std=c++11	\
+							-Wno-strict-overflow			\
 							-I$(GAME_INC_DIR)				\
 							-I$(GRAPHICS_INC_DIR)			\
 							-I$(AI_INC_DIR)					\
@@ -100,7 +101,7 @@ FIRST		:=	$(shell test -d $(BINARY_DIR)				|| mkdir $(BINARY_DIR))		\
 
 all			:	$(FIRST)
 					@$(ECHO) $(COLOR_4) "\n\nCompiling in "$(COLOR_2)"[ "$(COLOR_6)"RELEASE "$(COLOR_2)"]"$(COLOR_4)" mode.\n\n"$(COLOR_OFF)
-					@$(MAKE) $(NAME) CC=$(CC) CXXFLAGS='$(CXXFLAGS)' MAKEFLAGS='$(MAKEFLAGS) -j4 -l4' UNITTEST=no
+					@$(MAKE) $(NAME) CC=$(CC) CXXFLAGS='$(CXXFLAGS) -O3' MAKEFLAGS='$(MAKEFLAGS) -j4 -l4' UNITTEST=no
 
 debug		:	$(FIRST) fclean
 					@$(ECHO) $(COLOR_4) "\n\nCompiling in "$(COLOR_2)"[ "$(COLOR_6)"DEBUG "$(COLOR_2)"]"$(COLOR_4)" mode.\n\n"$(COLOR_OFF)

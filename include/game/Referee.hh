@@ -11,6 +11,9 @@
 
 # define DOUBLE_THREE_RULE	2
 # define SEARCH_RADIUS		3
+# define NO_ERROR 			0
+# define DOUBLE_THREE_ERROR	1
+# define NOT_EMPTY_ERROR	2
 
 # define MIN(a, b)	(((a) < (b)) ? (a) : (b))
 # define MAX(a, b)	(((a) > (b)) ? (a) : (b))
@@ -35,7 +38,7 @@ public:
 
 public:
 
-	void	putPieceOnBoard(int x, int y, char player);
+	int		putPieceOnBoard(int x, int y, char player);
 	void 	resetCell(int x, int y, char player);
 	void 	saveBoard();
 	void 	resetBoardLastSave();
@@ -52,7 +55,7 @@ private:
 	};
 
 private:
-	void			_checkDoubleThree(int x, int y, char player) const;
+	int				_checkDoubleThree(int x, int y, char player) const;
 	void			_checkWinner();
 	void			_checkCapturedPawn(int x, int y);
 	unsigned int	_countFreeThree(int x, int y, char player) const;

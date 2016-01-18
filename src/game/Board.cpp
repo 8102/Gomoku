@@ -49,12 +49,7 @@ void		Board::setCase(int x, int y, char status) {
   _board[POS(x,y)] = status;
 }
 
-/*
-** C'est dans cette fonction que tout se passe. Si tu enlève WIN_SIZE,
-** tu peux recompiler, tu vas voir c'est instantanné...
-*/
 void    Board::setBoard(char const *board) {
-  // std::copy(board, board + B_SIZE + JAIL_SIZE + WIN_SIZE, _board);
   std::memcpy(_board, board, B_SIZE + JAIL_SIZE + WIN_SIZE);
 }
 

@@ -93,7 +93,6 @@ std::pair<int, int>                                    AI_MonteCarlo::_getBestMo
     {
         if ((lastChance = _generateGames(it->first, it->second)) > bestChance)
         {
-            std::cout << "===================" << std::endl;
             bestChance = lastChance;
             bestPos.first = it->first;
             bestPos.second = it->second;
@@ -106,11 +105,13 @@ float                                                  AI_MonteCarlo::_generateG
 {
     float                                               winrate(0.0f);
     unsigned int                                        wins(0);
+    using namespace std::chrono;
 
-    std::cout << "avant" << std::endl;
-    std::cout << "x: " << x << " y: " << y << " player: " << _player << std::endl;
+    high_resolution_clock::time_point t1 = high_resolution_clock::now();
     _ref.putPieceOnBoard(x, y, _player);
-    std::cout << "après" << std::endl;
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+    auto duration = duration_cast<nanoseconds>(t2 - t1).count();
+    std::cout << duration << std::endl;
     _ref.saveBoard();
     for (unsigned int i = 0; i < max; ++i)
     {
@@ -134,35 +135,13 @@ bool                                                   AI_MonteCarlo::_generateG
         y = pos / MAX_WIDTH;
         if (AI_turn)
         {
-            try
-            {
-                _ref.putPieceOnBoard(x, y, _player);
+            if (!(_ref.putPieceOnBoard(x, y, _player)))
                 AI_turn = !AI_turn;
-            }
-            catch (NotEmptyError &e)
-            {
-                // do nothing
-            }
-            catch (DoubleThreeRule &e)
-            {
-                // do nothing
-            }
         }
         else
         {
-            try
-            {
-                _ref.putPieceOnBoard(x, y, (_player - '0') % 2 + 1 + '0');
+            if (!(_ref.putPieceOnBoard(x, y, (_player - '0') % 2 + 1 + '0')))
                 AI_turn = !AI_turn;
-            }
-            catch (NotEmptyError &e)
-            {
-                // do nothing
-            }
-            catch (DoubleThreeRule &e)
-            {
-                // do nothing
-            }
         }
     }
     _ref.resetBoardLastSave();

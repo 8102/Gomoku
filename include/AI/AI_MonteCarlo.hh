@@ -8,7 +8,7 @@
 # include "Referee.hh"
 
 # define NUMBER_OF_POSSIBILITIES_MAX        300
-# define NUMBER_OF_SIMULATIONS_PER_PIECE    100
+# define NUMBER_OF_SIMULATIONS_PER_PIECE    10
 
 class AI_MonteCarlo : public IAI
 {
