@@ -62,7 +62,7 @@ namespace             Heuristic
     ** use data collected trhough streaks of each directions to mark the influence mapping on the cell*/
     Cell              encryptData(unsigned char value, std::array<unsigned char, 8>& influence);
     /*
-    ** extract the influence mapping hints recorded in the given Cell */
+    extract the influence mapping hints recorded in the given Cell */
     influence         decryptData(Heuristic::Cell const c);
 
     /*
