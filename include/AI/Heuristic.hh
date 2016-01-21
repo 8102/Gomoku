@@ -31,6 +31,7 @@ namespace             Heuristic
       MaxLevel
     };
 
+
     /**/
     typedef struct    stateNode_s {
 
@@ -42,8 +43,35 @@ namespace             Heuristic
       std::array<u_NodePtr, TREE_LEVEL_WIDTH>  nodes; /* lower-level nodes of the tree */
     }                 stateNode;
 
-
+    /*
+    ** A Cell, once evaluated by Influence Mapping, will be constitued as follow :
+    ** bit representation of a 64-bits of a Cell.
+    ** numbers indicate bit idex, [] indicate a set of 3 bits, {} indicate a byte (8-bits)
+    **  64 [][][][][][][][]  40 [][][][][][][][]    16 {}             8 {}
+    **   player 2 influence   player 1 influence   various data     cell value
+    ** An influence of 8 x 3 bits corresponds to the streaks of a given player in each of 8-directions arround the cell
+    */
     typedef           long unsigned int        Cell;
+
+    /*
+    ** Node of the tree generated then evaluated for each play
+    */
+    typedef struct    TKnee_s
+    {
+      std::array<Cell, 361>           goban;  /* State of the current goban after the play, once it has been evaluated */
+      int                             x;  /* X position of the play, once the node has been evaluated */
+      int                             y;  /* Y position of the play, once the node has been evaluated */
+      int                             advantage;  /* Heuristically-determined advantage of the play */
+      int                             floor;  /* Depth of the node, indicating which player the play is for */
+      std::array<struct TKnee_s *, 5> children;  /* Lower-levels of the tree starting from this node. */
+    }                 TNode;
+
+
+    TNode*             createNode(std::array<Cell, 361>const& initialGoban, int Player, int depth);
+    bool               evaluateNode(TNode& node);
+    int                averageAdvantage(TNode& node);
+    TNode*             createTree(std::array<Cell, 361> const& goban, int depth);
+    void               deleteTree(Heuristic::TNode* Tree);
 
     typedef           struct        influence_s
     {

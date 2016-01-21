@@ -1,8 +1,87 @@
 #include "Heuristic.hh"
+#include "common.hpp"
 
-bool                    Heuristic::operator<=(Heuristic::stateNode const& l, Heuristic::stateNode const& r) {
+Heuristic::TNode*                 Heuristic::createNode(std::array<Cell, 361>const& initialGoban, int Player, int depth)
+{
+  TNode*                          node = nullptr;
 
-  return l.score <= r.score;
+  if (depth > 0)
+    {
+      if ((node = new TNode) == nullptr)
+        return nullptr;
+      node->goban = initialGoban;
+      node->x = -1;
+      node->y = -1;
+      node->advantage = -1;
+      node->floor = Player;
+      for (size_t i = 0;i < node->children.size(); i++)
+        node->children[i] = nullptr;
+    }
+  return node;
+}
+
+/*
+** Evaluate what play this node should represent, and record its impact on the cell goban
+** If the play grants victory the function return true and node's children won't be
+** evaluated by Heuristic::createTree
+*/
+bool                                Heuristic::evaluateNode(__attribute__((unused)) TNode& node)
+{
+  return false;
+}
+
+/*
+** compute average gain of a node children, in order to be used in Heuristic::resolveTree
+** If an average gain is significantly different when compared to others, we may decide
+** to evaluate it only or not evaluate it
+*/
+int                                 Heuristic::averageAdvantage(TNode& node)
+{
+  int                               mediane(0);
+  int                               cnt(0);
+
+  for (size_t i = 0; i < node.children.size(); i++)
+  {
+    if (node.children[i] != nullptr) {
+      mediane += node.children[i]->advantage;
+      ++cnt;
+    }
+  }
+
+  return mediane / cnt;
+}
+
+/*
+** Create a Tree of possibility
+** In order to reduce computing-time as well as use of ressources, each level of the tree shoud not excede
+** its floor ^ 5. We do that by using std::array<X, 5> and stocking the 5-bests answers for each node.
+** For example, level 0 will be 1 node, level 1 will be 5 and level 2 will be 25.
+*/
+
+Heuristic::TNode*                  Heuristic::createTree(std::array<Cell, 361>const& initialGoban, int player)
+{
+  TNode*                           node(nullptr);
+
+  if ((node = Heuristic::createNode(initialGoban, player, 1)) == nullptr)
+    return node;
+  /* evaluate Node */
+  if (Heuristic::evaluateNode(*node) == true)
+    return node;
+  /* createCHildren if Node is not a win condition */
+  for (size_t i = 0; i < node->children.size(); i++)
+    node->children[i] = Heuristic::createTree(node->goban, ((player + 1) % 2) + 1);
+  return node;
+}
+
+/*
+** Recursively delete Each Node of the Tree to free memory */
+void                              Heuristic::deleteTree(Heuristic::TNode* Tree)
+{
+  if (Tree == nullptr)
+    return;
+  for (size_t i = 0; i < Tree->children.size(); i++)
+    deleteTree(Tree->children[i]);
+  delete Tree;
 }
 
 /*
@@ -176,4 +255,9 @@ unsigned char         Heuristic::AknowledgeCell(int x, int y, std::array<char, 3
     }
   }
   return goban[POS(x, y)] + (sides[0] << 5) + (sides[1] << 2);
+}
+
+bool                    Heuristic::operator<=(Heuristic::stateNode const& l, Heuristic::stateNode const& r) {
+
+  return l.score <= r.score;
 }
