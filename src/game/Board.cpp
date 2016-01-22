@@ -55,7 +55,7 @@ void		Board::setCase(int x, int y, char status) {
 */
 void    Board::setBoard(char const *board) {
   // std::copy(board, board + B_SIZE + JAIL_SIZE + WIN_SIZE, _board);
-  std::memcpy(_board, board, B_SIZE + JAIL_SIZE + WIN_SIZE);
+  std::memcpy(_board, board, B_SIZE + JAIL_SIZE/* + WIN_SIZE*/);
 }
 
 void    Board::setWinnerCase(char winner) {

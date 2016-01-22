@@ -63,7 +63,7 @@ private:
 	void			_removeDoubleThree(int x1, int y1, int x2, int y2, char player) const;
 	bool			_freeThreePattern(char c1, char c2, char c3, char c4, char c5, char player) const;
 
-private:
+public:
 
 	Board				&_board;
 

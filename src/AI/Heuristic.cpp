@@ -1,10 +1,26 @@
 #include "Heuristic.hh"
 #include "common.hpp"
 
+std::array<Heuristic::Cell, 361>      Heuristic::translateGoban(char const * const goban)
+{
+  std::array<Heuristic::Cell, 361>    translated = {0};
+
+  for (size_t i = 0; i < 361; i++)
+    translated[i] = goban[i] - '0';
+
+  for (auto y = 0; y < 19; y++)
+    for (auto x = 0; x < 19; x++)
+      translated[POS(x, y)] = Heuristic::mesureInfluence(x, y, translated);
+
+  return translated;
+}
+
 /*
 ** used by std::vector<>::sort() */
 bool                              Heuristic::operator<(Heuristic::study const& r, Heuristic::study const& l)
 {
+  if (l.best == 4 && r.best < 4)
+    return true;
   if (r.best < l.best)
     return true;
   if (r.relevance < l.relevance)
@@ -131,6 +147,7 @@ void                              Heuristic::deleteTree(Heuristic::TNode* Tree)
   delete Tree;
 }
 
+
 /*
 ** For a given position, search for a given direction a contiguous streak of up to 4 pawns and encode it on either
 ** bitwise party of the result corresponding to the said-streak colour. */
@@ -148,7 +165,6 @@ unsigned char                      Heuristic::searchDirection(int x, int y, int 
       return content;
     if ((evaluated == 0 && (evaluated = (goban[POS(pX, pY)] & 0x07)) == 0) || (evaluated != (goban[POS(pX, pY)] & 0x07)))
       return content;
-//    std::cout << "searchDirection("<<x<<", "<<y<<") in ("<<pX<<", "<<pY<<"): evaluated : "<< (int)evaluated << std::endl;
     ++streak;
     content += (evaluated == 1 ? 1 : (evaluated == 2 ? 16 : 0));
     if (streak >= 4)
@@ -169,24 +185,8 @@ Heuristic::Cell                    Heuristic::encryptData(unsigned char value, s
 
   for (int i = 0; i < 8; i++)
   {
-    unsigned char p1_influence = (influence[i] & 0x0F);
-    unsigned char p2_influence = (influence[i] & 0xF0);
-
-    resultingCell |= (static_cast<Heuristic::Cell>(p2_influence) << (40 + (8 - (i + 2)) * 3));
-    resultingCell |= (static_cast<Heuristic::Cell>(p1_influence) << (16 + (8 - (i + 1)) * 3));
-#ifdef _DEBUG
-  //   std::cout << "p1 = " << (int)p1_influence << " ,  p2 = " << (int)p2_influence << std::endl;
-  //   std::cout << "value of c = " << resultingCell << std::endl;
-  //   for (int i = 64; i >= 0; i--)
-  //   {
-  //     std::cout << ((resultingCell >> i) & 1);
-  //     if ((i % 3) == 0)
-  //       std::cout << " ";
-  //     if (i == 40 || i == 16)
-  //       std::cout << " | ";
-  //   }
-  // std::cout << std::endl;
-#endif /* !DEBUG*/
+    resultingCell |= (static_cast<Heuristic::Cell>((influence[i] & 0xF0) >> 4) << (40 + (8 - (i + 1)) * 3));
+    resultingCell |= (static_cast<Heuristic::Cell>((influence[i] & 0x0F)) << (16 + (8 - (i + 1)) * 3));
   }
   return resultingCell;
 }
@@ -200,28 +200,12 @@ Heuristic::Cell                    Heuristic::encryptData(unsigned char value, s
 Heuristic::influence             Heuristic::decryptData(Heuristic::Cell const c)
 {
   Heuristic::influence           localInfluence = { {0} };
-  int                            p1((c >> (2 * 8)) & 0x00ffffff), p2(c >> (5 * 8));
+  int                            p1((c >> (2 * 8)) & 0x00ffffff), p2((c >> (5 * 8)));
 
-// #ifdef _DEBUG
-//   std::cout << "DEBUG : decryptData " << std::endl;
-// #endif /* !_DEBUG */
   for (int i = 0; i < 8; i++)
   {
-    localInfluence.paths[i] = (((((p2 >> (((8 - (i+1)) * 3))) & 0x07) >> 1) << 4) + ((p1 >> (((8-(i+1)) *3))) & 0x07));
-// #ifdef _DEBUG
-//     {
-//       if (i == 0 || i == 3 || i == 5 || i == 8)
-//         std::cout << std::endl;
-//       if (i == 4)
-//         std::cout << "[  "<< (c & 0x07) <<  "  ]";
-//       std::cout << "[" << (localInfluence.paths[i] & 0x0f) << " , " << ((localInfluence.paths[i] >> 4) & 0x07) << "]";
-//     }
-// #endif /* !_DEBUG */
+   localInfluence.paths[i] = (((((p2>>(((8-(i+1))*3)))&0x07))<<4) + ((p1>>(((8-(i+1))*3)))&0x07));
   }
-// #ifdef _DEBUG
-//   std::cout << std::endl;
-// #endif /* !_DEBUG */
-  // std::cout << "{" << (int)(localInfluence.paths[2] >> 4) <<  "}" << std::endl;
   return localInfluence;
 }
 
@@ -232,6 +216,7 @@ Heuristic::Cell                    Heuristic::mesureInfluence(int x, int y, std:
     std::array<unsigned char, 8>   localInfluence = {0};
     int                            i(0);
 
+
     for (auto vY = -1; vY <= 1; vY++)
       for (auto vX = -1; vX <= 1; vX++)
       {
@@ -241,21 +226,6 @@ Heuristic::Cell                    Heuristic::mesureInfluence(int x, int y, std:
           ++i;
         }
       }
-// #ifdef _DEBUG
-//     {
-//         std::cout << "DEBUG : Heuristic::mesureInfluence(" << x << ", " << y << ")" << std::endl;
-//         for (auto k = 0; k < 8; k++)
-//         {
-//           if (k == 0 || k == 3 || k == 5 || k == 8)
-//             std::cout << std::endl << "    ";
-//           if (k == 4)
-//             std::cout << "[X]";
-//           std::cout << "[" << (int)localInfluence[k] << "]";
-//         }
-//       std::cout << std::endl << "-------------------" << std::endl;
-//     }
-// #endif  /* !_DEBUG */
-
     return Heuristic::encryptData(goban[POS(x, y)], localInfluence);
 }
 
@@ -267,12 +237,6 @@ bool                    Heuristic::perimeter(int x, int y, std::array<char, 8>& 
   int                   i = 0;
   bool                  hasFoundPiece = false;
 
-#ifdef  _DEBUG
-        {
-          std::cout << "_DEBUG : Heuristic::PerimetericData() -- call on ("<< x << ", " << y << ") / POS(" << POS(x, y) << ")" << std::endl;
-          std::cout << "Bounds : x = {" << bounds[0] << ", " << bounds[2] << "} -- y = {" << bounds[1] << ", " << bounds[3] << "}" << std::endl;
-        }
-#endif  /* !_DEBUG */
   for (auto yIt = bounds[1]; yIt <= bounds[3]; yIt++) {
     for (auto xIt = bounds[0]; xIt <= bounds[2];  xIt++) {
 
