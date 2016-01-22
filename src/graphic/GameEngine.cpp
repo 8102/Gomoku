@@ -11,7 +11,7 @@ GameEngine::~GameEngine() {}
 
 void            GameEngine::init(unsigned int const& winWidth, unsigned int const& winHeight, std::string const& title) {
 
-  _win = make_unique< sf::RenderWindow >(sf::VideoMode(winWidth, winHeight), title);
+  _win = std::make_unique< sf::RenderWindow >(sf::VideoMode(winWidth, winHeight), title);
   loadAssets();
   _isRunning = true;
 }

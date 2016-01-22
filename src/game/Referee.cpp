@@ -7,6 +7,8 @@
 Referee::Referee(Board &board) : _board(board), _cDbleThree(true), _cCapture(true)
 {
 	std::fill(std::begin(_save), std::begin(_save) + B_SIZE + JAIL_SIZE + WIN_SIZE, 0);
+	_moves_played[PLAYER1] = std::vector<std::pair<int, int> >();
+	_moves_played[PLAYER2] = std::vector<std::pair<int, int> >();
 }
 
 Referee::~Referee()
@@ -58,6 +60,11 @@ char	Referee::getCase(int x, int y) const
 	return _board.getCase(x, y);
 }
 
+std::vector<std::pair<int, int> > &Referee::getMovesPlayed(char player)
+{
+	return _moves_played[player];
+}
+
 /*
 ** Public methodes
 */
@@ -90,11 +97,13 @@ void 	Referee::saveBoard()
 {
 	char const *save = _board.getBoard();
 	std::memcpy(_save, save, B_SIZE + JAIL_SIZE + WIN_SIZE);
+	_save_moves_played = _moves_played;
 }
 
 void 	Referee::resetBoardLastSave()
 {
 	_board.setBoard(_save);
+	_moves_played = _save_moves_played;
 }
 
 void 	Referee::resetGame()
@@ -106,11 +115,12 @@ void 	Referee::resetGame()
 ** Private methodes
 */
 
-int		Referee::_checkDoubleThree(int x, int y, char player) const
+int		Referee::_checkDoubleThree(int x, int y, char player)
 {
 	if (_board.getCase(x, y) == player + DOUBLE_THREE_RULE)
 		return DOUBLE_THREE_ERROR;
 	_board.setCase(x, y, player);
+	_moves_played[player].push_back(std::pair<int, int>(x, y));
 	for (int i = 0; i <= 2 * SEARCH_RADIUS + 2; ++i)
 	{
 		for (int j = 0; j <= 2 * SEARCH_RADIUS + 2; ++j)

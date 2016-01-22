@@ -10,6 +10,7 @@
 
 #include "Board.hh"
 #include "GameEngine.hh"
+#include "Heuristic.hh"
 
 //#ifdef      _WIN32
 //int         WINAPI    WinMain() {}

@@ -6,6 +6,8 @@
 # include <iostream>
 # include <vector>
 # include <algorithm>
+# include <map>
+# include <utility>
 # include "Board.hh"
 # include "Error.hh"
 
@@ -35,6 +37,7 @@ public:
 	bool 	getCaptureRule() const;
 	char const *getJail();
 	char	getCase(int x, int y) const;
+	std::vector<std::pair<int, int> > &getMovesPlayed(char player);
 
 public:
 
@@ -55,7 +58,7 @@ private:
 	};
 
 private:
-	int				_checkDoubleThree(int x, int y, char player) const;
+	int				_checkDoubleThree(int x, int y, char player);
 	void			_checkWinner();
 	void			_checkCapturedPawn(int x, int y);
 	unsigned int	_countFreeThree(int x, int y, char player) const;
@@ -77,6 +80,8 @@ private:
 
 private:
 	char				_save[B_SIZE + JAIL_SIZE + WIN_SIZE];
+	std::map<int, std::vector<std::pair<int, int> > > _moves_played;
+	std::map<int, std::vector<std::pair<int, int> > > _save_moves_played;
 
 };
 
