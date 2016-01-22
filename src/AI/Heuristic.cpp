@@ -1,7 +1,54 @@
 #include "Heuristic.hh"
 #include "common.hpp"
 
-Heuristic::TNode*                 Heuristic::createNode(std::array<Cell, 361>const& initialGoban, int Player, int depth)
+/*
+** used by std::vector<>::sort() */
+bool                              Heuristic::operator<(Heuristic::study const& r, Heuristic::study const& l)
+{
+  if (r.best < l.best)
+    return true;
+  if (r.relevance < l.relevance)
+    return true;
+  return false;
+}
+
+
+std::vector<Heuristic::study>     Heuristic::listRelevantPlays(std::array<Cell, 361>const& goban, int player)
+{
+  std::vector<Heuristic::study>   plays;
+
+  for (auto y = 0; y < 19; y++)
+    for (auto x = 0; x < 19; x++)
+      {
+        /* if cell if free and playable for player X */
+        if (((goban[POS(x, y)] & 0x07) == 0) && ((goban[POS(x, y)] & 0x0700) != (unsigned int)player))
+          {
+              Heuristic::influence  scoring = Heuristic::decryptData(goban[POS(x, y)]);
+              Heuristic::study      evl =  {0, 0, x, y};
+
+              for (size_t i = 0; i < 8; i++)
+                {
+                  int playerInfluence = (scoring.paths[i] >> (4 * (player - 1))) & 0x07;
+                  if (playerInfluence > evl.best)
+                  {
+                    evl.relevance += evl.best;
+                    evl.best = playerInfluence;
+                  }
+                  else
+                    evl.relevance += playerInfluence;
+                }
+            if (evl.best || evl.relevance > 0)
+            {
+              plays.push_back(evl);
+            }
+          }
+      }
+  std::sort(plays.begin(), plays.end());
+  std::reverse(plays.begin(), plays.end());
+  return plays;
+}
+
+Heuristic::TNode*                 Heuristic::createNode(std::array<Cell, 361>const& initialGoban, int player, int depth)
 {
   TNode*                          node = nullptr;
 
@@ -13,7 +60,7 @@ Heuristic::TNode*                 Heuristic::createNode(std::array<Cell, 361>con
       node->x = -1;
       node->y = -1;
       node->advantage = -1;
-      node->floor = Player;
+      node->floor = player;
       for (size_t i = 0;i < node->children.size(); i++)
         node->children[i] = nullptr;
     }
@@ -99,8 +146,9 @@ unsigned char                      Heuristic::searchDirection(int x, int y, int 
     pY += vy;
     if (pX < 0 || pY < 0 || pX > 18 || pY > 18)
       return content;
-    if ((evaluated == 0 && (evaluated = goban[POS(pX, pY)]) == 0) || (evaluated != goban[POS(pX, pY)]))
+    if ((evaluated == 0 && (evaluated = (goban[POS(pX, pY)] & 0x07)) == 0) || (evaluated != (goban[POS(pX, pY)] & 0x07)))
       return content;
+//    std::cout << "searchDirection("<<x<<", "<<y<<") in ("<<pX<<", "<<pY<<"): evaluated : "<< (int)evaluated << std::endl;
     ++streak;
     content += (evaluated == 1 ? 1 : (evaluated == 2 ? 16 : 0));
     if (streak >= 4)

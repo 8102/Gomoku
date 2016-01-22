@@ -41,7 +41,7 @@ void  printInfluencialGOBAN(std::array<Heuristic::Cell, 361>& goban, int const& 
           if (cellColor == 0)
             for (int k = 0; k < 8; k++)
               {
-                int maxStreak = (tab[y * 19 + x].paths[k] >> (4 * (playerInfluence - 1))) & 0x07;
+                int maxStreak = ( (tab[y * 19 + x].paths[k] & (0xffff ^ (4 * (playerInfluence - 1)))) >> (4 * (playerInfluence - 1))) & 0x07;
                 cellColor = (cellColor > maxStreak ? cellColor : maxStreak);
                 if (cellColor == 4)
                   break;
@@ -51,10 +51,8 @@ void  printInfluencialGOBAN(std::array<Heuristic::Cell, 361>& goban, int const& 
               {
                 if (i != 1 || j != 1)
                 {
-//                  int index = i * 3 + j;
                  int cellV = (int)((tab[y * 19 + x].paths[(i * 3 + j) >= 4 ? (i * 3 + j -1) : (i * 3 + j) ]) >> (4 * (playerInfluence - 1))) & 0x07;
                  std::cout <<  s[cellValue > 0 ? cellValue : (cellColor == 0 ? 0 : cellColor +  2)] << "[" << cellV << "]"<< s[0];
-//                  std::cout <<  s[cellValue > 0 ? cellValue : (cellColor == 0 ? 0 : cellColor +  2)] << "[" << (((int)tab[y * 19 + x].paths[index]) >> 4) << "]"<< s[0];
                 }
                 else
                   std::cout <<  s[cellValue] << "[" << cellValue  << "]"<< s[0];
@@ -66,6 +64,15 @@ void  printInfluencialGOBAN(std::array<Heuristic::Cell, 361>& goban, int const& 
     std::cout << std::endl;
     }
   std::cout << std::endl;
+
+  if (playerInfluence == 1)
+  {
+    std::cout << "HERE : toto" << std::endl;
+    std::cout << ((int)(tab[5 * 19 + 4].paths[1]) & 0x07) << std::endl;
+    std::cout << ((int)(tab[5 * 19 + 4].paths[1] >> 4) & 0x07) << std::endl;
+    std::cout << ((int)(tab[5 * 19 + 4].paths[1])) << std::endl;
+    std::cout << (int)Heuristic::searchDirection(4, 5, 0, -1, goban) << std::endl;
+  }
 }
 
 #endif /* _DEBUG */
@@ -104,6 +111,27 @@ int main() {
   goban[POS(4, 5)] = 2;
   printInfluencialGOBAN(goban, 1);
   printInfluencialGOBAN(goban, 2);
+
+  /* Get strongest 5 plays for each players */
+  std::array<Heuristic::Cell, 361> g = {0};
+  for (auto x = 0; x < 19; x++)
+  for (auto y = 0; y < 19; y++)
+  g[POS(x, y)] = Heuristic::mesureInfluence(x, y, goban);
+  auto plays = Heuristic::listRelevantPlays(g, 1);
+  std::cout << "5 best plays for each players : format =" << std::endl;
+  std::cout << "{x, y} (best streak, score of influence without best streak)" << std::endl;
+  std::cout << plays.size() << " relevant for player 1 plays have been found" << std::endl;
+  for (size_t i = 0; i < plays.size() && i < 5; i++)
+  {
+    std::cout << "plays N° " << (i + 1) << " for player " << 1 << " : {"<< plays[i].x << ", " << plays[i].y << "} (" << plays[i].best << ", " << plays[i].relevance << ")" << std::endl;
+  }
+  std::cout << std::endl;
+  plays = Heuristic::listRelevantPlays(g, 2);
+  std::cout << plays.size() << " relevant for player 2 plays have been found" << std::endl;
+  for (size_t i = 0; i < plays.size() && i < 5; i++)
+  {
+    std::cout << "plays N° " << (i + 1) << " for player " << 2 << " : {"<< plays[i].x << ", " << plays[i].y << "} (" << plays[i].best << ", " << plays[i].relevance << ")" << std::endl;
+  }
 
 
 #endif

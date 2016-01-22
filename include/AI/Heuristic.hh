@@ -5,6 +5,7 @@
 # include     <list>
 # include     <memory>
 # include     <array>
+# include     <algorithm>
 
 # ifdef       _DEBUG
 #  include      <iostream>
@@ -80,6 +81,18 @@ namespace             Heuristic
 
     }                 influence;
 
+    typedef           struct        study_s
+    {
+      int             best;
+      int             relevance;
+      int             x;
+      int             y;
+    }                 study;
+
+    bool              operator<(study const& r, study const& l);
+
+    std::vector<study>  listRelevantPlays(std::array<Cell, 361>const& goban, int player);
+
     /*
     ** Collect data to mesure the influence in both players series a cell can have and record it on the cell*/
     Cell              mesureInfluence(int x, int y, std::array<Cell, 361>& goban);
@@ -91,7 +104,7 @@ namespace             Heuristic
     Cell              encryptData(unsigned char value, std::array<unsigned char, 8>& influence);
     /*
     extract the influence mapping hints recorded in the given Cell */
-    influence         decryptData(Heuristic::Cell const c);
+    influence         decryptData(Cell const c);
 
     /*
     ** <--High-importance plays determination functions --> */
