@@ -12,7 +12,7 @@ RMDIR	=	rm -rf
 ECHO	=	echo -ne
 LINK	=	ln -fs
 CAT		=	cat
-
+GROUNDS ?= 	aplay -q
 COLOR_OFF	=	"\033[0m"
 COLOR_1		=	"\033[1;32m"
 COLOR_2		=	"\033[1;33m"
@@ -106,12 +106,12 @@ LOVE := $(COLOR_6)" - Best Regards,\n\n\t\t\tJamais.\n\n"
 all			:	$(FIRST)
 					@$(ECHO) $(COLOR_4) "\n\nCompiling in "$(COLOR_2)"[ "$(COLOR_6)"RELEASE "$(COLOR_2)"]"$(COLOR_4)" mode.\n\n"$(COLOR_OFF)
 					@if ($(MAKE) $(NAME) CC=$(CC) CXXFLAGS='$(CXXFLAGS) -O3' MAKEFLAGS='$(MAKEFLAGS) -j4 -l4' UNITTEST=no CLEVER_MAKEFILE=release); then $(ECHO);\
-			 		else if ($(ECHO) $(COLOR_3) && $(CAT)  "./.IWishIWasClever/.iwishicompiled"$(shell echo $${RANDOM} % 3 + 1 | bc)".ascii"); then $(ECHO) $(LOVE); fi; fi
+			 		else if ($(ECHO) $(COLOR_3) && $(CAT)  "./.IWishIWasClever/.iwishicompiled"$(shell echo $${RANDOM} % 3 + 1 | bc)".ascii"); then $(ECHO) $(LOVE) && $(GROUNDS) ./.IWishIWasClever/.jibbouze.wav; fi; fi
 
 debug		:	$(FIRST) fclean
 					@$(ECHO) $(COLOR_4) "\n\nCompiling in "$(COLOR_2)"[ "$(COLOR_6)"DEBUG "$(COLOR_2)"]"$(COLOR_4)" mode.\n\n"$(COLOR_OFF)
 					@if ($(MAKE) $(NAME) CC=$(CC) CXXFLAGS='$(CXXFLAGS) -g3 -D_DEBUG=1' MAKEFLAGS='$(MAKEFLAGS) -j4 -l4 ' UNITTEST=no CLEVER_MAKEFILE=debug); then $(ECHO);\
-			 		else if ($(ECHO) $(COLOR_3) && $(CAT)  "./.IWishIWasClever/.iwishicompiled"$(shell echo $${RANDOM} % 3 + 1 | bc)".ascii"); then $(ECHO) $(LOVE); fi; fi
+			 		else if ($(ECHO) $(COLOR_3) && $(CAT)  "./.IWishIWasClever/.iwishicompiled"$(shell echo $${RANDOM} % 3 + 1 | bc)".ascii"); then $(GROUNDS) ./.IWishIWasClever/.jibbouze.wav; fi; fi
 
 test		:	$(FIRST) fclean
 					@$(ECHO) $(COLOR_4) "\n\nCompiling in "$(COLOR_2)"[ "$(COLOR_6)"TESTING "$(COLOR_2)"]"$(COLOR_4)" mode.\n\n"$(COLOR_OFF)
