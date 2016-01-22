@@ -85,76 +85,76 @@ int main() {
   GameEngine    engine(obj);
 
 #ifdef _DEBUG
-  std::array<Heuristic::Cell, 361> goban = {0};
-
-  goban[POS(8, 8)] = 1;
-  goban[POS(0, 0)] = 1;
-  goban[POS(1, 1)] = 1;
-  goban[POS(2, 6)] = 1;
-  goban[POS(3, 3)] = 1;
-  goban[POS(4, 4)] = 1;
-  goban[POS(5, 5)] = 1;
-  goban[POS(15, 6)] = 1;
-  goban[POS(6, 6)] = 1;
-  goban[POS(2, 3)] = 1;
-  goban[POS(15, 15)] = 1;
-  goban[POS(15, 18)] = 1;
-  goban[POS(12, 5)] = 2;
-  goban[POS(5, 13)] = 2;
-  goban[POS(13, 13)] = 2;
-  goban[POS(6, 14)] = 2;
-  goban[POS(2, 18)] = 2;
-  goban[POS(14, 15)] = 2;
-  goban[POS(15, 18)] = 2;
-  goban[POS(15, 6)] = 1;
-  goban[POS(6, 8)] = 1;
-  goban[POS(4, 5)] = 2;
-  printInfluencialGOBAN(goban, 1);
-  goban[POS(8, 8)] = 2;
-  goban[POS(0, 0)] = 2;
-  goban[POS(1, 1)] = 2;
-  goban[POS(2, 6)] = 2;
-  goban[POS(3, 3)] = 2;
-  goban[POS(4, 4)] = 2;
-  goban[POS(5, 5)] = 2;
-  goban[POS(15, 6)] = 2;
-  goban[POS(6, 6)] = 2;
-  goban[POS(2, 3)] = 2;
-  goban[POS(15, 15)] = 2;
-  goban[POS(15, 18)] = 2;
-  goban[POS(12, 5)] = 1;
-  goban[POS(5, 13)] = 1;
-  goban[POS(13, 13)] = 1;
-  goban[POS(6, 14)] = 1;
-  goban[POS(2, 18)] = 1;
-  goban[POS(14, 15)] = 1;
-  goban[POS(15, 18)] = 1;
-  goban[POS(15, 6)] = 2;
-  goban[POS(6, 8)] = 2;
-  goban[POS(4, 5)] = 1;
-  printInfluencialGOBAN(goban, 2);
+  // std::array<Heuristic::Cell, 361> goban = {0};
+  //
+  // goban[POS(8, 8)] = 1;
+  // goban[POS(0, 0)] = 1;
+  // goban[POS(1, 1)] = 1;
+  // goban[POS(2, 6)] = 1;
+  // goban[POS(3, 3)] = 1;
+  // goban[POS(4, 4)] = 1;
+  // goban[POS(5, 5)] = 1;
+  // goban[POS(15, 6)] = 1;
+  // goban[POS(6, 6)] = 1;
+  // goban[POS(2, 3)] = 1;
+  // goban[POS(15, 15)] = 1;
+  // goban[POS(15, 18)] = 1;
+  // goban[POS(12, 5)] = 2;
+  // goban[POS(5, 13)] = 2;
+  // goban[POS(13, 13)] = 2;
+  // goban[POS(6, 14)] = 2;
+  // goban[POS(2, 18)] = 2;
+  // goban[POS(14, 15)] = 2;
+  // goban[POS(15, 18)] = 2;
+  // goban[POS(15, 6)] = 1;
+  // goban[POS(6, 8)] = 1;
+  // goban[POS(4, 5)] = 2;
+  // printInfluencialGOBAN(goban, 1);
+  // goban[POS(8, 8)] = 2;
+  // goban[POS(0, 0)] = 2;
+  // goban[POS(1, 1)] = 2;
+  // goban[POS(2, 6)] = 2;
+  // goban[POS(3, 3)] = 2;
+  // goban[POS(4, 4)] = 2;
+  // goban[POS(5, 5)] = 2;
+  // goban[POS(15, 6)] = 2;
+  // goban[POS(6, 6)] = 2;
+  // goban[POS(2, 3)] = 2;
+  // goban[POS(15, 15)] = 2;
+  // goban[POS(15, 18)] = 2;
+  // goban[POS(12, 5)] = 1;
+  // goban[POS(5, 13)] = 1;
+  // goban[POS(13, 13)] = 1;
+  // goban[POS(6, 14)] = 1;
+  // goban[POS(2, 18)] = 1;
+  // goban[POS(14, 15)] = 1;
+  // goban[POS(15, 18)] = 1;
+  // goban[POS(15, 6)] = 2;
+  // goban[POS(6, 8)] = 2;
+  // goban[POS(4, 5)] = 1;
+  // printInfluencialGOBAN(goban, 2);
 
   /* Get strongest 5 plays for each players */
-  std::array<Heuristic::Cell, 361> g = {0};
-  for (auto x = 0; x < 19; x++)
-  for (auto y = 0; y < 19; y++)
-  g[POS(x, y)] = Heuristic::mesureInfluence(x, y, goban);
-  auto plays = Heuristic::listRelevantPlays(g, 1);
-  std::cout << "5 best plays for each players : format =" << std::endl;
-  std::cout << "{x, y} (best streak, score of influence without best streak)" << std::endl;
-  std::cout << plays.size() << " relevant for player 1 plays have been found" << std::endl;
-  for (size_t i = 0; i < plays.size() && i < 5; i++)
-  {
-    std::cout << "plays N° " << (i + 1) << " for player " << 1 << " : {"<< plays[i].x << ", " << plays[i].y << "} (" << plays[i].best << ", " << plays[i].relevance << ")" << std::endl;
-  }
-  std::cout << std::endl;
-  plays = Heuristic::listRelevantPlays(g, 2);
-  std::cout << plays.size() << " relevant for player 2 plays have been found" << std::endl;
-  for (size_t i = 0; i < plays.size() && i < 5; i++)
-  {
-    std::cout << "plays N° " << (i + 1) << " for player " << 2 << " : {"<< plays[i].x << ", " << plays[i].y << "} (" << plays[i].best << ", " << plays[i].relevance << ")" << std::endl;
-  }
-
+  // std::array<Heuristic::Cell, 361> g = {0};
+  // for (auto x = 0; x < 19; x++)
+  // for (auto y = 0; y < 19; y++)
+  // g[POS(x, y)] = Heuristic::mesureInfluence(x, y, goban);
+  // auto plays = Heuristic::listRelevantPlays(g, 1);
+  // std::cout << "5 best plays for each players : format =" << std::endl;
+  // std::cout << "{x, y} (best streak, score of influence without best streak)" << std::endl;
+  // std::cout << plays.size() << " relevant for player 1 plays have been found" << std::endl;
+  // for (size_t i = 0; i < plays.size() && i < 5; i++)
+  // {
+  //   std::cout << "plays N° " << (i + 1) << " for player " << 1 << " : {"<< plays[i].x << ", " << plays[i].y << "} (" << plays[i].best << ", " << plays[i].relevance << ")" << std::endl;
+  // }
+  // std::cout << std::endl;
+  // plays = Heuristic::listRelevantPlays(g, 2);
+  // std::cout << plays.size() << " relevant for player 2 plays have been found" << std::endl;
+  // for (size_t i = 0; i < plays.size() && i < 5; i++)
+  // {
+  //   std::cout << "plays N° " << (i + 1) << " for player " << 2 << " : {"<< plays[i].x << ", " << plays[i].y << "} (" << plays[i].best << ", " << plays[i].relevance << ")" << std::endl;
+  // }
+  //
 #endif
 
   engine.init();
