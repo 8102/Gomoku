@@ -54,7 +54,7 @@ namespace             Heuristic
     */
     typedef           long unsigned int        Cell;
 
-    std::array<Cell, 361>             translateGoban(char const* const goban);
+    std::array<Heuristic::Cell, 361>      translateGoban(char const * const goban);
 
     /*
     ** Node of the tree generated then evaluated for each play

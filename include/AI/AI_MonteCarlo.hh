@@ -6,7 +6,7 @@
 # include <random>
 # include "IAI.hh"
 # include "Referee.hh"
-# include "ThreadPool.h"
+# include "ThreadPool.hpp"
 
 # define RAND_DIAMETER                      7
 # define NUMBER_OF_POSSIBILITIES_MAX        8

@@ -73,7 +73,7 @@ GAME_SRC		?=	main.cpp			\
 								Game.cpp
 
 AI_SRC			?=	AI_MonteCarlo.cpp	\
-								Heuristic.cpp			\
+					Heuristic.cpp			\
 
 GRAPHICS_SRC	?=	GameEngine.cpp	\
 
