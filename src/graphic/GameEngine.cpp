@@ -1,5 +1,9 @@
 #include      "GameEngine.hh"
+#include      "Heuristic.hh"
 
+#ifdef _DEBUG
+void  printInfluencialGOBAN(std::array<Heuristic::Cell, 361>& goban, int const& playerInfluence);
+#endif
 GameEngine::GameEngine(Board& board)
   : _board(board), _referee(board), _ai('2', _referee), _playerIndex(0), _isRunning(false), _winner(false), _info("") {
 
@@ -163,8 +167,26 @@ void            GameEngine::run() {
       drawRulesState();
       if (_playerIndex % 2 == 1)
       {
-          _ai.playOneTurn();
+#ifdef _DEBUG
+        auto finalGoban = _referee._board.getBoard();
+        auto evaluatedGoban = Heuristic::translateGoban(finalGoban);
+
+        auto plays = Heuristic::listRelevantPlays(evaluatedGoban, 2);
+        if (plays.size() > 0)
+        {
+          auto p = plays[0];
+          printInfluencialGOBAN(evaluatedGoban, 2);
+          for (auto s = 0; s < plays.size() && s < 10 ; s++)
+            std::cout << "(" << plays[s].x << ", " << plays[s].y << ") . ";
+          std::cout << std::endl;
+          _referee.putPieceOnBoard(p.x, p.y, 50);
+        } else _referee.putPieceOnBoard(10, 10, 50);
+        ++_playerIndex;
+#else
+         _ai.playOneTurn();
           ++_playerIndex;
+
+#endif /* !_DEBUG */
       }
       if (treatEvent(s) == true)
           stop();
@@ -274,5 +296,6 @@ bool            GameEngine::treatAction(std::string& s) {
     s += winner;
     _winner = true;
   }
+
   return true;
 }
