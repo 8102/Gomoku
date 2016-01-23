@@ -7,6 +7,8 @@
 Referee::Referee(Board &board) : _board(board), _cDbleThree(true), _cCapture(true)
 {
 	std::fill(std::begin(_save), std::begin(_save) + B_SIZE + JAIL_SIZE + WIN_SIZE, 0);
+	_moves_played[PLAYER1] = std::vector<std::pair<int, int> >();
+	_moves_played[PLAYER2] = std::vector<std::pair<int, int> >();
 }
 
 Referee::~Referee()
@@ -58,24 +60,33 @@ char	Referee::getCase(int x, int y) const
 	return _board.getCase(x, y);
 }
 
+std::vector<std::pair<int, int> > &Referee::getMovesPlayed(char player)
+{
+	return _moves_played[player];
+}
+
 /*
 ** Public methodes
 */
 
-void	Referee::putPieceOnBoard(int x, int y, char player)
+int		Referee::putPieceOnBoard(int x, int y, char player)
 {
-	if (_board.getCase(x, y) == PLAYER1 || _board.getCase(x, y) == PLAYER2)
-		throw NotEmptyError("This case is already use by player " + std::string(&player, 1));
+	char c = _board.getCase(x, y);
+	if (c == PLAYER1 || c == PLAYER2)
+		return NOT_EMPTY_ERROR;
 	if (_cDbleThree == true)
-		_checkDoubleThree(x, y, player);
+	{
+		if (int error = _checkDoubleThree(x, y, player))
+			return error;
+	}
 	if (_cCapture == true)
 		_checkCapturedPawn(x, y);
 	_checkWinner();
+	return NO_ERROR;
 }
 
 void 	Referee::resetCell(int x, int y, char player)
 {
-	std::cout << x << " " << y << " " << (int)_board.getCase(x, y) << " " << (int)player << std::endl;
 	if (_board.getCase(x, y) == player)
 		_board.setCase(x, y, EMPTY);
 	else
@@ -85,13 +96,14 @@ void 	Referee::resetCell(int x, int y, char player)
 void 	Referee::saveBoard()
 {
 	char const *save = _board.getBoard();
-	// std::copy(save, save + B_SIZE + JAIL_SIZE + WIN_SIZE, _save);
 	std::memcpy(_save, save, B_SIZE + JAIL_SIZE + WIN_SIZE);
+	_save_moves_played = _moves_played;
 }
 
 void 	Referee::resetBoardLastSave()
 {
 	_board.setBoard(_save);
+	_moves_played = _save_moves_played;
 }
 
 void 	Referee::resetGame()
@@ -103,11 +115,12 @@ void 	Referee::resetGame()
 ** Private methodes
 */
 
-void	Referee::_checkDoubleThree(int x, int y, char player) const
+int		Referee::_checkDoubleThree(int x, int y, char player)
 {
 	if (_board.getCase(x, y) == player + DOUBLE_THREE_RULE)
-		throw DoubleThreeRule("Forbidden position on (" + std::to_string(x) + ", " + std::to_string(y) + ").");
+		return DOUBLE_THREE_ERROR;
 	_board.setCase(x, y, player);
+	_moves_played[player].push_back(std::pair<int, int>(x, y));
 	for (int i = 0; i <= 2 * SEARCH_RADIUS + 2; ++i)
 	{
 		for (int j = 0; j <= 2 * SEARCH_RADIUS + 2; ++j)
@@ -126,6 +139,7 @@ void	Referee::_checkDoubleThree(int x, int y, char player) const
 			}
 		}
 	}
+	return NO_ERROR;
 }
 
 int		Referee::_lineSum(char c1, char c2, char c3, char c4, char player) const
@@ -336,7 +350,7 @@ void	Referee::_removeDoubleThree(int x1, int y1, int x2, int y2, char player) co
 	}
 }
 
-void	Referee::_checkCapturedPawn(int x, int y)
+void		Referee::_checkCapturedPawn(int x, int y)
 {
 	char player = _board.getCase(x, y), enemy = (player -'0') % 2 + 1 + '0';
 

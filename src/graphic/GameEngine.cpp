@@ -284,19 +284,15 @@ bool            GameEngine::treatAction(std::string& s) {
   if (getTarget(p) == false)
     return getButtonTarget();
   s = "";
-  try
-  {
-    _referee.putPieceOnBoard(p.x - 1, p.y - 1, (_playerIndex % 2) + 1 + 48);
-   ++_playerIndex;
-  }
-  catch (NotEmptyError &e)
-  {
-    s = "Cell not Empty";
-  }
-  catch (DoubleThreeRule &e)
-  {
-    s = "Double three";
-  }
+    if (int error = _referee.putPieceOnBoard(p.x - 1, p.y - 1, (_playerIndex % 2) + 1 + 48))
+      {
+        if (error == NOT_EMPTY_ERROR)
+          s = "Cell not Empty";
+        else if (error == DOUBLE_THREE_ERROR)
+          s = "Double three";
+      }
+    else
+      ++_playerIndex;
   if (char winner = _referee.getWinner())
   {
     s = std::string("Winner : Player ");

@@ -30,15 +30,16 @@ LINKING		=	yes
 #########################################################
 
 CXXFLAGS		=		-W -Wall -Wextra -ansi -std=c++14		\
-								-I$(GAME_INC_DIR)										\
-								-I$(GRAPHICS_INC_DIR)								\
-								-I$(AI_INC_DIR)											\
+								-Wno-strict-overflow			\
+								-I$(GAME_INC_DIR)				\
+								-I$(GRAPHICS_INC_DIR)			\
+								-I$(AI_INC_DIR)					\
 
 MAKEFLAGS		+=	--warn-undefined-variables				\
-								--warn-unused-variables						\
+								--warn-unused-variables		\
 								--no-print-directory
 
-LFLAGS			= 	-lsfml-system -lsfml-graphics -lsfml-window -lsfml-audio
+LFLAGS			= 	-lsfml-system -lsfml-graphics -lsfml-window -lsfml-audio -lpthread
 
 INCLUDE_DIR		=		./include/
 BINARY_DIR		=		./bin/
@@ -72,7 +73,7 @@ GAME_SRC		?=	main.cpp			\
 								Game.cpp
 
 AI_SRC			?=	AI_MonteCarlo.cpp	\
-								Heuristic.cpp			\
+					Heuristic.cpp			\
 
 GRAPHICS_SRC	?=	GameEngine.cpp	\
 
@@ -104,7 +105,7 @@ LOVE := $(COLOR_6)" - Best Regards,\n\n\t\t\tJamais.\n\n"
 
 all			:	$(FIRST)
 					@$(ECHO) $(COLOR_4) "\n\nCompiling in "$(COLOR_2)"[ "$(COLOR_6)"RELEASE "$(COLOR_2)"]"$(COLOR_4)" mode.\n\n"$(COLOR_OFF)
-					@if ($(MAKE) $(NAME) CC=$(CC) CXXFLAGS='$(CXXFLAGS)' MAKEFLAGS='$(MAKEFLAGS) -j4 -l4' UNITTEST=no CLEVER_MAKEFILE=release); then $(ECHO);\
+					@if ($(MAKE) $(NAME) CC=$(CC) CXXFLAGS='$(CXXFLAGS) -O3' MAKEFLAGS='$(MAKEFLAGS) -j4 -l4' UNITTEST=no CLEVER_MAKEFILE=release); then $(ECHO);\
 			 		else if ($(ECHO) $(COLOR_3) && $(CAT)  "./.IWishIWasClever/.iwishicompiled"$(shell echo $${RANDOM} % 3 + 1 | bc)".ascii"); then $(ECHO) $(LOVE) && $(GROUNDS) ./.IWishIWasClever/.jibbouze.wav; fi; fi
 
 debug		:	$(FIRST) fclean
