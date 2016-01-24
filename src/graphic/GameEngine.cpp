@@ -168,7 +168,6 @@ void            GameEngine::run() {
       drawRulesState();
       if (_playerIndex % 2 == 1 && !_winner)
       {
-#ifdef _DEBUG
         auto finalGoban = _referee._board.getBoard();
         auto evaluatedGoban = Heuristic::translateGoban(finalGoban);
 
@@ -180,17 +179,11 @@ void            GameEngine::run() {
           evaluatedGoban = Heuristic::translateGoban(finalGoban);
 
           plays = Heuristic::listRelevantPlays(evaluatedGoban, 2);
+#ifdef _DEBUG
           printInfluencialGOBAN(evaluatedGoban, 2);
-          for (auto s = 0; s < plays.size(); s++)
-            std::cout << "(" << plays[s].x << ", " << plays[s].y << " --> [" << plays[s].best << ", " << plays[s].relevance << ", " << plays[s].defense << "]" << ") . ";
-          std::cout << std::endl;
+#endif /* !_DEBUG */
         } else _referee.putPieceOnBoard(10, 10, 50);
         ++_playerIndex;
-#else
-         _ai.playOneTurn();
-          ++_playerIndex;
-
-#endif /* !_DEBUG */
         if (char winner = _referee.getWinner())
         {
           s = std::string("Winner : Player ");
