@@ -181,8 +181,8 @@ void            GameEngine::run() {
 
           plays = Heuristic::listRelevantPlays(evaluatedGoban, 2);
           printInfluencialGOBAN(evaluatedGoban, 2);
-          for (auto s = 0; s < plays.size() && s < 10 ; s++)
-            std::cout << "(" << plays[s].x << ", " << plays[s].y << " --> [" << plays[s].best << ", " << plays[s].relevance << "]" << ") . ";
+          for (auto s = 0; s < plays.size(); s++)
+            std::cout << "(" << plays[s].x << ", " << plays[s].y << " --> [" << plays[s].best << ", " << plays[s].relevance << ", " << plays[s].defense << "]" << ") . ";
           std::cout << std::endl;
         } else _referee.putPieceOnBoard(10, 10, 50);
         ++_playerIndex;

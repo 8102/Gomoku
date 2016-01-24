@@ -84,6 +84,7 @@ int main() {
 
   GameEngine    engine(obj);
 
+
 #ifdef _DEBUG
   // std::array<Heuristic::Cell, 361> goban = {0};
   //
@@ -133,7 +134,6 @@ int main() {
   // goban[POS(6, 8)] = 2;
   // goban[POS(4, 5)] = 1;
   // printInfluencialGOBAN(goban, 2);
-  std::cout << std::endl;
   /* Get strongest 5 plays for each players */
   // std::array<Heuristic::Cell, 361> g = {0};
   // for (auto x = 0; x < 19; x++)

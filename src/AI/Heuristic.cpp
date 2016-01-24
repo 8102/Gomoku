@@ -15,17 +15,42 @@ std::array<Heuristic::Cell, 361>      Heuristic::translateGoban(char const * con
   return translated;
 }
 
+void                                  Heuristic::reverseTranslation(std::array<Heuristic::Cell, 361> encodedGoban, char *& goban)
+{
+  for (size_t i = 0; i < 361; i++)
+      goban[i] = (encodedGoban[i] & 0x07) + '0';
+}
+
 /*
 ** used by std::vector<>::sort() */
-bool                              Heuristic::operator<(Heuristic::study const& r, Heuristic::study const& l)
+bool                              Heuristic::operator<(Heuristic::study const& l, Heuristic::study const& r)
 {
-  if (l.best == 4 && r.best < 4)
-    return true;
-  if (r.best < l.best)
-    return true;
-  if (r.relevance < l.relevance)
-    return true;
-  return false;
+  if (r.best == 4) return true;
+  if (l.best == 4) return false;
+  if ((r.defense != l.defense) || r.defense >= 3 || l.defense >= 3)
+    {
+      if (r.defense == 4) return true;
+      if (l.defense == 4) return false;
+      if (r.defense == 3) return true;
+      if (l.defense == 3) return false;
+    }
+  if (r.best != l.best) return l.best < r.best;
+  if (r.relevance != l.relevance) return l.relevance < r.best;
+  return l.defense < r.defense;
+
+
+  // if (l.best == 4) return false;
+  // if (r.best == 4) return true;
+  // if ((r.defense != l.defense) || r.defense == 4 || l.defense == 4)
+  //   {
+  //     if (r.defense == 4) return true;
+  //     if (l.defense == 4) return false;
+  //     if (r.defense == 3) return true;
+  //     if (l.defense == 3) return false;
+  //   }
+  // if (r.best != l.best) return l.best < r.best;
+  // if (r.relevance != l.relevance) return l.relevance < r.best;
+  // return l.defense < r.defense;
 }
 
 
@@ -40,11 +65,17 @@ std::vector<Heuristic::study>     Heuristic::listRelevantPlays(std::array<Cell, 
         if (((goban[POS(x, y)] & 0x07) == 0) && ((goban[POS(x, y)] & 0x0700) != (unsigned int)player))
           {
               Heuristic::influence  scoring = Heuristic::decryptData(goban[POS(x, y)]);
-              Heuristic::study      evl =  {0, 0, x, y};
+              Heuristic::study      evl =  {0, 0, 0, x, y};
+              int                   wsenses[4] = {0, 0, 0, 0}, osenses[4] = {0, 0, 0, 0}, icr = 0;
 
               for (size_t i = 0; i < 8; i++)
                 {
                   int playerInfluence = (scoring.paths[i] >> (4 * (player - 1))) & 0x07;
+                  int defense = (scoring.paths[i] >> (4 * (2 - player))) & 0x07;
+
+                  wsenses[icr] += playerInfluence;
+                  osenses[icr] += defense;
+                  icr = (i < 4 ? icr + 1 : (i == 4 ? 3 : icr - 1)) % 4;
                   if (playerInfluence > evl.best)
                   {
                     evl.relevance += evl.best;
@@ -52,8 +83,14 @@ std::vector<Heuristic::study>     Heuristic::listRelevantPlays(std::array<Cell, 
                   }
                   else
                     evl.relevance += playerInfluence;
+                  evl.defense = (defense > evl.defense ? defense : evl.defense);
                 }
-            if (evl.best || evl.relevance > 0)
+            for (size_t i = 0; i < 4; i++)
+              {
+                if (wsenses[i] > evl.best) { evl.relevance += evl.best; evl.best = wsenses[i]; }
+                if (osenses[i] > evl.defense) evl.defense = osenses[i];
+              }
+            if (evl.best || evl.relevance > 0 || evl.defense >= 3 || (plays.size() == 0 && evl.defense > 0))
             {
               plays.push_back(evl);
             }
@@ -204,7 +241,7 @@ Heuristic::influence             Heuristic::decryptData(Heuristic::Cell const c)
 
   for (int i = 0; i < 8; i++)
   {
-   localInfluence.paths[i] = (((((p2>>(((8-(i+1))*3)))&0x07))<<4) + ((p1>>(((8-(i+1))*3)))&0x07));
+   localInfluence.paths[i] = (((((p2>>(((8-(i+1))*3)))&0x07))<<4) | ((p1>>(((8-(i+1))*3)))&0x07));
   }
   return localInfluence;
 }
@@ -227,49 +264,4 @@ Heuristic::Cell                    Heuristic::mesureInfluence(int x, int y, std:
         }
       }
     return Heuristic::encryptData(goban[POS(x, y)], localInfluence);
-}
-
-/*
-** Fill an array with the value of surrounding cell of (x, y). if no Piece have been found, return false */
-bool                    Heuristic::perimeter(int x, int y, std::array<char, 8>& dataCollector,std::array<char, 361>const& goban) {
-
-  int                   bounds[4] = {x <= 0 ? 0 : (x - 1), y <= 0 ? 0 : (y - 1), x >= 18 ? 18 : (x + 1), y >= 18 ? 18 : (y + 1)};
-  int                   i = 0;
-  bool                  hasFoundPiece = false;
-
-  for (auto yIt = bounds[1]; yIt <= bounds[3]; yIt++) {
-    for (auto xIt = bounds[0]; xIt <= bounds[2];  xIt++) {
-
-      if (xIt != x || yIt != y)
-      {
-        if (((dataCollector[i] = goban[POS(xIt, yIt)]) & 3) != 0)
-          hasFoundPiece = true;
-        ++i; /* ( i = bounds[0] + (bounds[1] * 3) ? */
-      }
-    }
-  }
-  return hasFoundPiece;
-}
-
-unsigned char         Heuristic::AknowledgeCell(int x, int y, std::array<char, 361>const& goban)
-{
-  std::array<char, 8> dataCollector{0};
-  char                sides[2] = {0, 0};
-
-  if (Heuristic::perimeter(x, y, dataCollector, goban) == true)
-  {
-    for (int i = 0; i < 8; i++)
-    {
-        if (sides[0] < 4)
-          sides[0] += !(!(dataCollector[i] & 1));
-        if (sides[1] < 4)
-          sides[1] += !(!(dataCollector[i] & 2));
-    }
-  }
-  return goban[POS(x, y)] + (sides[0] << 5) + (sides[1] << 2);
-}
-
-bool                    Heuristic::operator<=(Heuristic::stateNode const& l, Heuristic::stateNode const& r) {
-
-  return l.score <= r.score;
 }

@@ -22,7 +22,6 @@
 
 # define              TREE_LEVEL_WIDTH   (5)
 
-# define              u_NodePtr           std::unique_ptr<struct stateNode_s>
 
 namespace             Heuristic
 {
@@ -34,15 +33,15 @@ namespace             Heuristic
 
 
     /**/
-    typedef struct    stateNode_s {
-
-      std::unique_ptr<char>         board;  /* inherited board through previous levels, including evaluated play */
-      int                           x;      /* x position of this node's play */
-      int                           y;      /* y position of this node's play */
-      int                           score;  /* Heuristic score of this action */
-      char                          mode;   /* define wether the play is agressive or passive, and at wich rate */ /* ( ??? ) */
-      std::array<u_NodePtr, TREE_LEVEL_WIDTH>  nodes; /* lower-level nodes of the tree */
-    }                 stateNode;
+    // typedef struct    stateNode_s {
+    //
+    //   std::unique_ptr<char>         board;  /* inherited board through previous levels, including evaluated play */
+    //   int                           x;      /* x position of this node's play */
+    //   int                           y;      /* y position of this node's play */
+    //   int                           score;  /* Heuristic score of this action */
+    //   char                          mode;   /* define wether the play is agressive or passive, and at wich rate */ /* ( ??? ) */
+    //   std::array<u_NodePtr, TREE_LEVEL_WIDTH>  nodes; /* lower-level nodes of the tree */
+    // }                 stateNode;
 
     /*
     ** A Cell, once evaluated by Influence Mapping, will be constitued as follow :
@@ -55,6 +54,7 @@ namespace             Heuristic
     typedef           long unsigned int        Cell;
 
     std::array<Heuristic::Cell, 361>      translateGoban(char const * const goban);
+    void                                  reverseTranslation(std::array<Heuristic::Cell, 361> encodedGoban, char *& goban);
 
     /*
     ** Node of the tree generated then evaluated for each play
@@ -87,6 +87,7 @@ namespace             Heuristic
     {
       int             best;
       int             relevance;
+      int             defense;
       int             x;
       int             y;
     }                 study;
@@ -108,27 +109,6 @@ namespace             Heuristic
     extract the influence mapping hints recorded in the given Cell */
     influence         decryptData(Cell const c);
 
-    /*
-    ** <--High-importance plays determination functions --> */
-    u_NodePtr         winPossibility(std::unique_ptr<char> const& actualBoard, Player const& evaluated, eLevel const& goal);
-    u_NodePtr         alignFour(std::unique_ptr<char> const& actualBoard, Player const& evaluated);
-
-    /*
-    ** <- knowledge representation inscribed in a cell --> */
-    /* inscribe Influencial Mapping Weight on a cell according to the links it can provide */
-    bool              perimeter(int x, int y, std::array<char, 8>& dataCollector, std::array<char, 361>const& goban);
-
-#define               EXTRACT_P1(x)     (((x) >> 5))
-#define               EXTRACT_P2(x)     (((x) >> 2) & 0x7)
-
-    unsigned char     AknowledgeCell(int x, int y, std::array<char, 361>const& goban);
-    /* Inscribe Knowledge representation in the current Boards Cell */ /* Heavy on first call, undoubtably much lighter after */
-    bool              AknowledgeBoard(std::unique_ptr<char>& board);
-
-
-    /*
-    ** */
-    bool              operator<=(stateNode const& l, stateNode const& r);
 };
 
 #endif                /* !___HEURISTIC_HH___ */
