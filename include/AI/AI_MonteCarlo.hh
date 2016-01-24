@@ -9,8 +9,10 @@
 # include "ThreadPool.hpp"
 # include "Heuristic.hh"
 
+# include <chrono>
+
 # define RAND_DIAMETER                      7
-# define NUMBER_OF_POSSIBILITIES_MAX        8
+# define NUMBER_OF_POSSIBILITIES_MAX        16
 # define NUMBER_OF_SIMULATIONS_PER_PIECE    1000
 # define NUMBER_OF_THREADS                  8
 

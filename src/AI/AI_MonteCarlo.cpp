@@ -50,32 +50,31 @@ bool            AI_MonteCarlo::playOneTurn()
     std::shared_ptr<std::vector<std::pair<int, int> > > possibilities = this->_getRandomFreePossibilities(NUMBER_OF_POSSIBILITIES_MAX, _player);
     std::pair<int, int> bestMoveCoord;
     float bestChance(0.0f), lastChance;
-    int pack = possibilities->size() / NUMBER_OF_THREADS;
-    int rest = possibilities->size() % NUMBER_OF_THREADS;
-    _results_coord = std::vector<std::pair<int, int> >(NUMBER_OF_THREADS + 1, std::pair<int, int>(0, 0));
+    if (possibilities->size() == 0)
+        possibilities->push_back(std::pair<int, int>(10, 10));
+
+    unsigned int case_max = possibilities->size() % NUMBER_OF_THREADS;
+    unsigned int max_value = possibilities->size() / NUMBER_OF_THREADS + 1;
+    unsigned int min_value = max_value - 1;
+    _results_coord = std::vector<std::pair<int, int> >(NUMBER_OF_THREADS, std::pair<int, int>(0, 0));
 
     auto it_begin = possibilities->begin();
-    auto it_end = it_begin + pack;
-    for (short i = 0; i < NUMBER_OF_THREADS; ++i)
+    auto it_end = it_begin;
+    for (unsigned short i = 1; i <= NUMBER_OF_THREADS; ++i)
     {
+        if (i <= case_max)
+            it_end += max_value;
+        else
+            it_end += min_value;
         _args.push_back(std::vector<std::pair<int, int> >(it_begin, it_end));
         it_begin = it_end;
-        it_end += pack;
-    }
-    if (rest)
-        _args.push_back(std::vector<std::pair<int, int> >(it_begin, possibilities->end()));
-    std::cout << _ais.size() << " " << _args.size() << " " << _results_coord.size() << std::endl;
-    for (auto it = _args.begin(); it != _args.end(); ++it)
-    {
-        std::cout << it->size() << std::endl;
     }
     std::cout << "lancement des simulations" << std::endl;
     for (short i = 0; i < NUMBER_OF_THREADS; ++i)
     {
-        _results.emplace_back(_pool.enqueue(&AI_MonteCarlo::_getBestMove, _ais[i], _args[i], &(_results_coord[i])));
+        if (_args[i].size())
+            _results.emplace_back(_pool.enqueue(&AI_MonteCarlo::_getBestMove, _ais[i], _args[i], &(_results_coord[i])));
     }
-    if (rest)
-        _results.emplace_back(_pool.enqueue(&AI_MonteCarlo::_getBestMove, this, _args.back(), &(_results_coord.back())));
     std::cout << "lancement finis" << std::endl;
     short i(0);
     for (auto it = _results.begin(); it != _results.end(); ++it)
@@ -106,8 +105,6 @@ std::shared_ptr<std::vector<std::pair<int, int> > >     AI_MonteCarlo::_getRando
     std::array<Heuristic::Cell, 361> evaluatedGoban = Heuristic::translateGoban(finalGoban);
     std::vector<Heuristic::study> plays = Heuristic::listRelevantPlays(evaluatedGoban, for_player - '0');
     unsigned int i(0);
-
-    // std::cout << "j'ai " << plays.size() << " cases à tester" << std::endl;
 
     for (auto it = plays.begin(); it != plays.end(); ++it)
     {
