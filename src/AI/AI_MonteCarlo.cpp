@@ -54,7 +54,6 @@ bool            AI_MonteCarlo::playOneTurn()
     int rest = possibilities->size() % NUMBER_OF_THREADS;
     _results_coord = std::vector<std::pair<int, int> >(NUMBER_OF_THREADS + 1, std::pair<int, int>(0, 0));
 
-    std::cout << "size: " << possibilities->size() << std::endl;
     auto it_begin = possibilities->begin();
     auto it_end = it_begin + pack;
     for (short i = 0; i < NUMBER_OF_THREADS; ++i)
@@ -66,19 +65,18 @@ bool            AI_MonteCarlo::playOneTurn()
     if (rest)
         _args.push_back(std::vector<std::pair<int, int> >(it_begin, possibilities->end()));
     std::cout << _ais.size() << " " << _args.size() << " " << _results_coord.size() << std::endl;
-    std::cout << "args" << std::endl;
     for (auto it = _args.begin(); it != _args.end(); ++it)
     {
         std::cout << it->size() << std::endl;
     }
-    std::cout << "end" << std::endl;
+    std::cout << "lancement des simulations" << std::endl;
     for (short i = 0; i < NUMBER_OF_THREADS; ++i)
     {
         _results.emplace_back(_pool.enqueue(&AI_MonteCarlo::_getBestMove, _ais[i], _args[i], &(_results_coord[i])));
     }
-    std::cout << "coucou" << std::endl;
     if (rest)
         _results.emplace_back(_pool.enqueue(&AI_MonteCarlo::_getBestMove, this, _args.back(), &(_results_coord.back())));
+    std::cout << "lancement finis" << std::endl;
     short i(0);
     for (auto it = _results.begin(); it != _results.end(); ++it)
     {
@@ -90,14 +88,6 @@ bool            AI_MonteCarlo::playOneTurn()
         }
         ++i;
     }
-    std::cout << "results coord" << std::endl;
-    for (auto it = _results_coord.begin(); it != _results_coord.end(); ++it)
-    {
-        std::cout << "(" << it->first << ", " << it->second << ")"<< std::endl;
-    }
-    std::cout << "end" << std::endl;
-    std::cout << "best chance -> " << bestChance << " coord: " << bestMoveCoord.first << ", " << bestMoveCoord.second << std::endl;
-    // this->_getBestMove(possibilities, bestMoveCoord);
     _ref.putPieceOnBoard(bestMoveCoord.first, bestMoveCoord.second, _player);
     std::cout << "playOneTurn END" << std::endl;
     _results.clear();
@@ -112,45 +102,65 @@ bool            AI_MonteCarlo::playOneTurn()
 std::shared_ptr<std::vector<std::pair<int, int> > >     AI_MonteCarlo::_getRandomFreePossibilities(unsigned int max, char for_player)
 {
     std::shared_ptr<std::vector<std::pair<int, int> > > free_possibilities(new std::vector<std::pair<int, int> >);
-    std::vector<std::pair<int, int> >                   possibilities;
-    int                                                 pos(0);
-    unsigned int                                        m(0);
-    char                                                piece;
-    std::vector<std::pair<int, int> >                 & moves = _ref.getMovesPlayed((for_player - '0') % 2 + 1 + '0');
-    std::pair<int, int>                                 tmp;
+    const char *finalGoban = _ref._board.getBoard();
+    std::array<Heuristic::Cell, 361> evaluatedGoban = Heuristic::translateGoban(finalGoban);
+    std::vector<Heuristic::study> plays = Heuristic::listRelevantPlays(evaluatedGoban, for_player - '0');
+    unsigned int i(0);
 
-    for (auto it = moves.begin(); it != moves.end(); ++it)
+    // std::cout << "j'ai " << plays.size() << " cases à tester" << std::endl;
+
+    for (auto it = plays.begin(); it != plays.end(); ++it)
     {
-        for (short i = 0; i < RAND_DIAMETER; ++i)
-        {
-            for (short j = 0; j < RAND_DIAMETER; ++j)
-            {
-                if ((piece = _ref.getCase(it->first + j - 3, it->second + i - 3)) == EMPTY || piece + _player == '5')
-                    possibilities.push_back(std::pair<int, int>(it->first + j - 3, it->second + i - 3));
-            }
-        }
-    }
-    unsigned int poss_size = possibilities.size();
-    if (poss_size > max)
-    {
-        while (m < max)
-        {
-            pos = _distribution(_mt) % poss_size;
-            tmp = possibilities[pos];
-            free_possibilities->push_back(tmp);
-            ++m;
-        }
-    }
-    else if (poss_size < max && poss_size > 0)
-    {
-        *free_possibilities = possibilities;
-    }
-    else
-    {
-        // trouver des frees places
+        if (i == max)
+            break;
+        free_possibilities->push_back(std::pair<int, int>(it->x, it->y));
+        ++i;
     }
     return free_possibilities;
 }
+
+// std::shared_ptr<std::vector<std::pair<int, int> > >     AI_MonteCarlo::_getRandomFreePossibilities(unsigned int max, char for_player)
+// {
+//     std::shared_ptr<std::vector<std::pair<int, int> > > free_possibilities(new std::vector<std::pair<int, int> >);
+//     std::vector<std::pair<int, int> >                   possibilities;
+//     int                                                 pos(0);
+//     unsigned int                                        m(0);
+//     char                                                piece;
+//     std::vector<std::pair<int, int> >                 & moves = _ref.getMovesPlayed((for_player - '0') % 2 + 1 + '0');
+//     std::pair<int, int>                                 tmp;
+//
+//     for (auto it = moves.begin(); it != moves.end(); ++it)
+//     {
+//         for (short i = 0; i < RAND_DIAMETER; ++i)
+//         {
+//             for (short j = 0; j < RAND_DIAMETER; ++j)
+//             {
+//                 if ((piece = _ref.getCase(it->first + j - 3, it->second + i - 3)) == EMPTY || piece + _player == '5')
+//                     possibilities.push_back(std::pair<int, int>(it->first + j - 3, it->second + i - 3));
+//             }
+//         }
+//     }
+//     unsigned int poss_size = possibilities.size();
+//     if (poss_size > max)
+//     {
+//         while (m < max)
+//         {
+//             pos = _distribution(_mt) % poss_size;
+//             tmp = possibilities[pos];
+//             free_possibilities->push_back(tmp);
+//             ++m;
+//         }
+//     }
+//     else if (poss_size < max && poss_size > 0)
+//     {
+//         *free_possibilities = possibilities;
+//     }
+//     else
+//     {
+//         // trouver des frees places
+//     }
+//     return free_possibilities;
+// }
 
 float                                                 AI_MonteCarlo::_getBestMove(std::vector<std::pair<int, int> > const &possibilities, std::pair<int, int> *move)
 {
@@ -198,19 +208,23 @@ bool                                                   AI_MonteCarlo::_generateG
 {
     bool                                                AI_turn(false);
     std::shared_ptr<std::vector<std::pair<int, int> > > random_possibilitie;
+    int                                                 pos(0), x(0), y(0);
 
     while (!_ref.getWinner())
     {
+        pos = _distribution(_mt);
+        x = pos % MAX_WIDTH;
+        y = pos / MAX_WIDTH;
         if (AI_turn)
         {
-            random_possibilitie = this->_getRandomFreePossibilities(1, _player);
-            if (!(_ref.putPieceOnBoard(random_possibilitie->begin()->first, random_possibilitie->begin()->second, _player)))
+            // random_possibilitie = this->_getRandomFreePossibilities(1, _player);
+            if (!(_ref.putPieceOnBoard(x, y, _player)))
                 AI_turn = !AI_turn;
         }
         else
         {
-            random_possibilitie = this->_getRandomFreePossibilities(1, (_player - '0') % 2 + 1 + '0');
-            if (!(_ref.putPieceOnBoard(random_possibilitie->begin()->first, random_possibilitie->begin()->second, (_player - '0') % 2 + 1 + '0')))
+            // random_possibilitie = this->_getRandomFreePossibilities(1, (_player - '0') % 2 + 1 + '0');
+            if (!(_ref.putPieceOnBoard(x, y, (_player - '0') % 2 + 1 + '0')))
                 AI_turn = !AI_turn;
         }
     }

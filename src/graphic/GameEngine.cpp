@@ -38,6 +38,7 @@ void            GameEngine::resetBoard() {
   _winner = false;
   _info = "";
   _referee.resetGame();
+  _playerIndex = 0;
 }
 
 void            GameEngine::changeCaptureRule() {
@@ -165,7 +166,7 @@ void            GameEngine::run() {
       for (auto it = _buttons.begin(); it != _buttons.end(); it++)
         _win->draw(*it);
       drawRulesState();
-      if (_playerIndex % 2 == 1)
+      if (_playerIndex % 2 == 1 && !_winner)
       {
 #ifdef _DEBUG
         auto finalGoban = _referee._board.getBoard();
@@ -190,6 +191,12 @@ void            GameEngine::run() {
           ++_playerIndex;
 
 #endif /* !_DEBUG */
+        if (char winner = _referee.getWinner())
+        {
+          s = std::string("Winner : Player ");
+          s += winner;
+          _winner = true;
+        }
       }
       if (treatEvent(s) == true)
           stop();
