@@ -315,9 +315,9 @@ void	Referee::_checkWinner()
 {
 	std::vector<enum direction>	dirs;
 
-	if (_board.getJail(1) == 10)
+	if (_board.getJail(1) > 10)
 		_board.setWinnerCase(PLAYER1);
-	if (_board.getJail(2) == 10)
+	if (_board.getJail(2) > 10)
 		_board.setWinnerCase(PLAYER2);
 	for (int i = 0; i < MAX_HEIGHT; ++i)
 	{

@@ -11,14 +11,14 @@
 #include <functional>
 #include <stdexcept>
 
-class ThreadPool
+class AI_ThreadPool
 {
 public:
 
-    ThreadPool(size_t);
+    AI_ThreadPool(size_t);
     template<class F, class... Args>
     auto enqueue(F&& f, Args&&... args) -> std::future<typename std::result_of<F(Args...)>::type>;
-    ~ThreadPool();
+    ~AI_ThreadPool();
 
 private:
     std::vector<std::thread> _workers;
@@ -31,7 +31,7 @@ private:
 
 };
 
-inline ThreadPool::ThreadPool(size_t threads)
+inline AI_ThreadPool::AI_ThreadPool(size_t threads)
     :   _stop(false)
 {
     for(size_t i = 0; i < threads; ++i)
@@ -58,7 +58,7 @@ inline ThreadPool::ThreadPool(size_t threads)
 }
 
 template<class F, class... Args>
-auto ThreadPool::enqueue(F&& f, Args&&... args) -> std::future<typename std::result_of<F(Args...)>::type>
+auto AI_ThreadPool::enqueue(F&& f, Args&&... args) -> std::future<typename std::result_of<F(Args...)>::type>
 {
     using return_type = typename std::result_of<F(Args...)>::type;
 
@@ -78,7 +78,7 @@ auto ThreadPool::enqueue(F&& f, Args&&... args) -> std::future<typename std::res
     return res;
 }
 
-inline ThreadPool::~ThreadPool()
+inline AI_ThreadPool::~AI_ThreadPool()
 {
     {
         std::unique_lock<std::mutex> lock(_mutex);
