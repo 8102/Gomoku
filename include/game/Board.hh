@@ -31,7 +31,7 @@
 # define POS(x,y)	  ((MAX_WIDTH * y) + x)
 
 class			Board {
-private:
+public:
   char			_board[B_SIZE + JAIL_SIZE + WIN_SIZE];
 
 public:
