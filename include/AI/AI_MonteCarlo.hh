@@ -6,7 +6,7 @@
 # include <random>
 # include "IAI.hh"
 # include "Referee.hh"
-# include "ThreadPool.h"
+# include "ThreadPool.hpp"
 # include "Heuristic.hh"
 
 # define RAND_DIAMETER                      7

@@ -54,7 +54,6 @@ bool            AI_MonteCarlo::playOneTurn()
     int rest = possibilities->size() % NUMBER_OF_THREADS;
     _results_coord = std::vector<std::pair<int, int> >(NUMBER_OF_THREADS + 1, std::pair<int, int>(0, 0));
 
-    std::cout << "size: " << possibilities->size() << std::endl;
     auto it_begin = possibilities->begin();
     auto it_end = it_begin + pack;
     for (short i = 0; i < NUMBER_OF_THREADS; ++i)
@@ -66,19 +65,18 @@ bool            AI_MonteCarlo::playOneTurn()
     if (rest)
         _args.push_back(std::vector<std::pair<int, int> >(it_begin, possibilities->end()));
     std::cout << _ais.size() << " " << _args.size() << " " << _results_coord.size() << std::endl;
-    std::cout << "args" << std::endl;
     for (auto it = _args.begin(); it != _args.end(); ++it)
     {
         std::cout << it->size() << std::endl;
     }
-    std::cout << "end" << std::endl;
+    std::cout << "lancement des simulations" << std::endl;
     for (short i = 0; i < NUMBER_OF_THREADS; ++i)
     {
         _results.emplace_back(_pool.enqueue(&AI_MonteCarlo::_getBestMove, _ais[i], _args[i], &(_results_coord[i])));
     }
-    std::cout << "coucou" << std::endl;
     if (rest)
         _results.emplace_back(_pool.enqueue(&AI_MonteCarlo::_getBestMove, this, _args.back(), &(_results_coord.back())));
+    std::cout << "lancement finis" << std::endl;
     short i(0);
     for (auto it = _results.begin(); it != _results.end(); ++it)
     {
@@ -90,14 +88,6 @@ bool            AI_MonteCarlo::playOneTurn()
         }
         ++i;
     }
-    std::cout << "results coord" << std::endl;
-    for (auto it = _results_coord.begin(); it != _results_coord.end(); ++it)
-    {
-        std::cout << "(" << it->first << ", " << it->second << ")"<< std::endl;
-    }
-    std::cout << "end" << std::endl;
-    std::cout << "best chance -> " << bestChance << " coord: " << bestMoveCoord.first << ", " << bestMoveCoord.second << std::endl;
-    // this->_getBestMove(possibilities, bestMoveCoord);
     _ref.putPieceOnBoard(bestMoveCoord.first, bestMoveCoord.second, _player);
     std::cout << "playOneTurn END" << std::endl;
     _results.clear();
