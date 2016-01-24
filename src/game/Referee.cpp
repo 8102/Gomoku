@@ -74,6 +74,9 @@ int		Referee::putPieceOnBoard(int x, int y, char player)
 	char c = _board.getCase(x, y);
 	if (c == PLAYER1 || c == PLAYER2)
 		return NOT_EMPTY_ERROR;
+	if (_board.getCase(x, y) == player + DOUBLE_THREE_RULE)
+		return DOUBLE_THREE_ERROR;
+	_board.setCase(x, y, player);
 	if (_cDbleThree == true)
 	{
 		if (int error = _checkDoubleThree(x, y, player))
@@ -117,9 +120,6 @@ void 	Referee::resetGame()
 
 int		Referee::_checkDoubleThree(int x, int y, char player)
 {
-	if (_board.getCase(x, y) == player + DOUBLE_THREE_RULE)
-		return DOUBLE_THREE_ERROR;
-	_board.setCase(x, y, player);
 	_moves_played[player].push_back(std::pair<int, int>(x, y));
 	for (int i = 0; i <= 2 * SEARCH_RADIUS + 2; ++i)
 	{
@@ -315,9 +315,9 @@ void	Referee::_checkWinner()
 {
 	std::vector<enum direction>	dirs;
 
-	if (_board.getJail(1) == 10)
+	if (_board.getJail(1) > 10)
 		_board.setWinnerCase(PLAYER1);
-	if (_board.getJail(2) == 10)
+	if (_board.getJail(2) > 10)
 		_board.setWinnerCase(PLAYER2);
 	for (int i = 0; i < MAX_HEIGHT; ++i)
 	{
